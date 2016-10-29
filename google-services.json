@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "280324264017",
+    "firebase_url": "https://trafficquest-9b525.firebaseio.com",
+    "project_id": "trafficquest-9b525",
+    "storage_bucket": "trafficquest-9b525.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:280324264017:android:09305c5a1357ebe9",
+        "android_client_info": {
+          "package_name": "pkc.trafficquest.sccapstone.trafficquest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "280324264017-g5j4evp3qaa95f0j7titlol4a5a9l7nb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pkc.trafficquest.sccapstone.trafficquest",
+            "certificate_hash": "7C94B7CE29CF0164690D986101BBC0ED3EC1871D"
+          }
+        },
+        {
+          "client_id": "280324264017-nkf549tqlfomvfnf7hhrt3u16ms5p6vb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmjym2LP5-lpWQ0LVbk_BpCY0R8-oD8bM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "280324264017-nkf549tqlfomvfnf7hhrt3u16ms5p6vb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
