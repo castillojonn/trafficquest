@@ -27,7 +27,7 @@
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/email_login_form"
+            android:id="@+id/email_Signup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -44,24 +44,12 @@
                 android:singleLine="true"
                 android:textSize="20dp"
                 android:textIsSelectable="true" />
-            <EditText
-                android:id="@+id/username_in"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Username"
-
-                android:inputType="textPersonName"
-                android:maxLines="1"
-                android:maxLength="10"
-                android:singleLine="true"
-                android:textSize="20dp"
-                android:textIsSelectable="true" />
 
             <EditText
                 android:id="@+id/password_in"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/prompt_password"
+                android:hint="Password"
 
                 android:inputType="textPassword"
                 android:maxLines="1"
@@ -81,16 +69,6 @@
                 android:singleLine="true"
                 android:textSize="20dp"
                 android:textIsSelectable="false" />
-            <EditText
-                android:id="@+id/phonenumber_in"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Phone Number"
-
-                android:inputType="phone"
-                android:maxLength="10"
-                android:maxLines="1"
-                android:singleLine="true" />
 
 
             <Button

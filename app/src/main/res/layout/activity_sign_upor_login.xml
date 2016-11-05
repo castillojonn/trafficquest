@@ -25,7 +25,7 @@
     <Button
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:id="@+id/email_signin_button"
+        android:id="@+id/email_signup_button"
         android:layout_alignTop="@+id/email_login_button"
         android:text="sign Up"
         android:layout_alignParentEnd="true"

@@ -1,12 +1,17 @@
 package pkc.trafficquest.sccapstone.trafficquest;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 /**
@@ -20,10 +25,9 @@ public class LoginActivity extends AppCompatActivity  {
 
 
     // UI references.
-    private AutoCompleteTextView mEmailView;
-    private EditText mPasswordView;
-    private View mProgressView;
-    private View mLoginFormView;
+    private EditText mEmail;
+    private EditText mPassword;
+    private Button mLogin;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener; //detects changes in the authentication state
 
@@ -32,20 +36,34 @@ public class LoginActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmail = (EditText) findViewById(R.id.email_login);
+        mLogin = (Button) findViewById(R.id.mlogin_button);
+        mAuth = FirebaseAuth.getInstance();
+        mPassword= (EditText) findViewById(R.id.password_login);
+        mLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signIn();
+            }
+        });
 
 
-        mPasswordView = (EditText) findViewById(R.id.password);
-
-
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-
-
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
     }
 
-
+    public void signIn(){
+        mAuth.signInWithEmailAndPassword(mEmail.getText().toString(),mPassword.getText().toString()).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()){
+                    Toast.makeText(getApplicationContext(),"User sign in succesfull",Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                }
+                else{
+                    Toast.makeText(getApplicationContext(),"Incorrect password and email combination",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 
     }
 

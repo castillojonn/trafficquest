@@ -1,20 +1,18 @@
 package pkc.trafficquest.sccapstone.trafficquest;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class SignUporLoginActivity extends AppCompatActivity implements View.OnClickListener {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private Button signin;
+    private Button signIn;
     private Button signUp;
     @Override
     public void onClick(View view) {
@@ -31,22 +29,20 @@ public class SignUporLoginActivity extends AppCompatActivity implements View.OnC
         setContentView(R.layout.activity_sign_upor_login);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener(){
+        signUp = (Button) findViewById(R.id.email_signup_button);
+        signIn = (Button) findViewById(R.id.email_login_button);
+        signIn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth fbauth){
-                FirebaseUser user = fbauth.getCurrentUser();
-                if (user != null){
-                    Toast.makeText(getApplicationContext(), "User is already signed with " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
-
-                }
-                else {
-                    Toast.makeText(getApplicationContext(),"No user detected",Toast.LENGTH_SHORT).show();
-                }
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(),LoginActivity.class));
             }
-        };
-
+        });
+        signUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(),SignUpActivity.class));
+            }
+        });
     }
 
 
