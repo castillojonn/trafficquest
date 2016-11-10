@@ -60,7 +60,7 @@ public class SignUpActivity extends AppCompatActivity {
         String email = emailAddress.getText().toString();
         String pass = password.getText().toString();
         String repass = retypePass.getText().toString();
-        if (pass == repass){
+        if (pass.equals(repass)){
             mAuth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
