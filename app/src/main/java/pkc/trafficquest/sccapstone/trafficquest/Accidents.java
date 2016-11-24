@@ -9,8 +9,26 @@ public class Accidents {
     private String endTime;
     private int accidentId;
     private String description;
-    private int numVehicles;
+    //private int numVehicles;
     private int severity;
+    private String lastModified;
+    private String Congestion;
+    public String getCongestion() {
+        return Congestion;
+    }
+
+    public void setCongestion(String congestion) {
+        Congestion = congestion;
+    }
+
+
+    public String getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(String lastModified) {
+        this.lastModified = lastModified;
+    }
 
     public String getsTime() {
         return sTime;
@@ -42,14 +60,6 @@ public class Accidents {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public int getNumVehicles() {
-        return numVehicles;
-    }
-
-    public void setNumVehicles(int numVehicles) {
-        this.numVehicles = numVehicles;
     }
 
     public int getSeverity() {
