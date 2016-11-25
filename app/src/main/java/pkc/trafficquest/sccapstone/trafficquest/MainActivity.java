@@ -108,8 +108,8 @@ public class MainActivity extends AppCompatActivity {
         acc.enqueue(new Callback<RequestPackage>() {
             @Override
             public void onResponse(Call<RequestPackage> call, Response<RequestPackage> response) {
-                RequestPackage res = new RequestPackage();
-                res = response.body();
+                //RequestPackage res = response.body();
+                //res = response.body();
                 try{
                     if(response!= null){
                         Toast.makeText(getApplicationContext(),"Message: "+response.message()+": "+response.code(),Toast.LENGTH_LONG).show();

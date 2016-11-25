@@ -11,7 +11,7 @@ public class ResourceSet {
 
     @SerializedName("estimatedTotal")
     @Expose
-    private Integer estimatedTotal;
+    private int estimatedTotal;
     @SerializedName("resources")
     @Expose
     private List<Accidents> resources = new ArrayList<Accidents>();
@@ -21,7 +21,7 @@ public class ResourceSet {
      * @return
      *     The estimatedTotal
      */
-    public Integer getEstimatedTotal() {
+    public int getEstimatedTotal() {
         return estimatedTotal;
     }
 
@@ -30,7 +30,7 @@ public class ResourceSet {
      * @param estimatedTotal
      *     The estimatedTotal
      */
-    public void setEstimatedTotal(Integer estimatedTotal) {
+    public void setEstimatedTotal(int estimatedTotal) {
         this.estimatedTotal = estimatedTotal;
     }
 

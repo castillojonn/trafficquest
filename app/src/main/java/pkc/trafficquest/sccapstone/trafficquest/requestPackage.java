@@ -26,7 +26,7 @@ public class RequestPackage {
     List<ResourceSet> resourceSets = new ArrayList<ResourceSet>();
     @SerializedName("statusCode")
     @Expose
-    private String statusCode;
+    private int statusCode;
     @SerializedName("statusDescription")
     @Expose
     private String statusDescription;
@@ -34,11 +34,11 @@ public class RequestPackage {
     @Expose
     private String traceId;
 
-    public String getStatusCode() {
+    public int getStatusCode() {
         return statusCode;
     }
 
-    public void setStatusCode(String statusCode) {
+    public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
     }
 
