@@ -1,10 +1,11 @@
 
 package pkc.trafficquest.sccapstone.trafficquest;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ResourceSet {
 
@@ -13,7 +14,7 @@ public class ResourceSet {
     private Integer estimatedTotal;
     @SerializedName("resources")
     @Expose
-    private List<Resource> resources = new ArrayList<Resource>();
+    private List<Accidents> resources = new ArrayList<Accidents>();
 
     /**
      * 
@@ -38,7 +39,7 @@ public class ResourceSet {
      * @return
      *     The resources
      */
-    public List<Resource> getResources() {
+    public List<Accidents> getResources() {
         return resources;
     }
 
@@ -47,7 +48,7 @@ public class ResourceSet {
      * @param resources
      *     The resources
      */
-    public void setResources(List<Resource> resources) {
+    public void setResources(List<Accidents> resources) {
         this.resources = resources;
     }
 

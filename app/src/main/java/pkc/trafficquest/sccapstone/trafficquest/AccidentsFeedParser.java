@@ -15,9 +15,9 @@ public class AccidentsFeedParser {
                 acc.setAccidentId(obj.getInt("incidentId"));
                 acc.setDescription(obj.getString("description"));
                 acc.setsTime(obj.getString("start"));
-                acc.setEndTime(obj.getString("end"));
+                acc.setEnd(obj.getString("end"));
                 acc.setLastModified(obj.getString("lastModified"));
-                acc.setCongestion(obj.getString("congestion"));
+                acc.setRoadClosed(obj.getString("congestion"));
 
                 aArrayList.add(acc);
             }

@@ -12,7 +12,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -105,8 +104,32 @@ public class MainActivity extends AppCompatActivity {
                 .baseUrl(ENDPOINT).addConverterFactory(GsonConverterFactory.create()).build();
 
         AccidentsAPI api = restAdapter.create(AccidentsAPI.class);
-        Call<ArrayList<Accidents>> acc = api.soontobedecided();
-        acc.enqueue(new Callback<ArrayList<Accidents>>() {
+        Call<RequestPackage> acc = api.soontobedecided();
+        acc.enqueue(new Callback<RequestPackage>() {
+            @Override
+            public void onResponse(Call<RequestPackage> call, Response<RequestPackage> response) {
+                RequestPackage res = new RequestPackage();
+                res = response.body();
+                try{
+                    if(response!= null){
+                        Toast.makeText(getApplicationContext(),"Message: "+response.message()+": "+response.code(),Toast.LENGTH_LONG).show();
+                    }
+                    else{
+                        Toast.makeText(getApplicationContext(),"Message: "+response.message()+": "+response.code(),Toast.LENGTH_LONG).show();
+                    }
+                }
+                catch (Exception e){
+                    Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RequestPackage> call, Throwable t) {
+                Toast.makeText(getApplicationContext(),call.toString()+"The request failed",Toast.LENGTH_LONG).show();
+            }
+        });
+        /*
+        acc.enqueue(new Callback<ArrayList<RequestPackage>>() {
             @Override
             public void onResponse(Call<ArrayList<Accidents>> call, Response<ArrayList<Accidents>> response) {
                 accidentses = response;
@@ -137,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        */
         /*api.groupList(new Call<ArrayList<Accidents>>() {
             @Override
             public void onResponse(Call<ArrayList<Accidents>> call, Response<ArrayList<Accidents>> response) {

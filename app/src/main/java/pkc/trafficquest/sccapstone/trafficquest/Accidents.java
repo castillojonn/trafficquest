@@ -1,16 +1,31 @@
 package pkc.trafficquest.sccapstone.trafficquest;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by pkcho on 11/24/2016.
  */
 
 public class Accidents {
+    @SerializedName("incidentId")
+    @Expose
     private int incidentId;
+    @SerializedName("description")
+    @Expose
     private String description;
-    private String startTime;
-    private String endTime;
+    @SerializedName("start")
+    @Expose
+    private String start;
+    @SerializedName("end")
+    @Expose
+    private String end;
+    @SerializedName("lastModified")
+    @Expose
     private String lastModified;
-    private String congestion;
+    @SerializedName("roadClosed")
+    @Expose
+    private String roadClosed;
 
     public int getIncidentId() {
         return incidentId;
@@ -28,20 +43,20 @@ public class Accidents {
         this.description = description;
     }
 
-    public String getStartTime() {
-        return startTime;
+    public String getStart() {
+        return start;
     }
 
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
+    public void setStart(String start) {
+        this.start = start;
     }
 
-    public String getEndTime() {
-        return endTime;
+    public String getEnd() {
+        return end;
     }
 
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
+    public void setEnd(String end) {
+        this.end = end;
     }
 
     public String getLastModified() {
@@ -52,12 +67,12 @@ public class Accidents {
         this.lastModified = lastModified;
     }
 
-    public String getCongestion() {
-        return congestion;
+    public String getRoadClosed() {
+        return roadClosed;
     }
 
-    public void setCongestion(String congestion) {
-        this.congestion = congestion;
+    public void setRoadClosed(String roadClosed) {
+        this.roadClosed = roadClosed;
     }
 
 
