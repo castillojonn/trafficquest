@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,6 +12,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,11 +21,18 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MainActivity extends AppCompatActivity {
     public static final String API_KEY = "AmJHdhFiW4EQCdWrgEoTk5-vo8zW-96v2LBmeBgnc0z_FV0Ru-gZizGCLfhtRtrJ";
     public static final String ENDPOINT = "http://dev.virtualearth.net";
     private FirebaseAuth mAuth;
-    ArrayList<Accidents> accidentses = new ArrayList<Accidents>();
+    Response<ArrayList<Accidents>> accidentses;
+    private ListView view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //Hello welcome to the code
+        view = (ListView) findViewById(R.id.aListview);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,6 +69,12 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            if(isOnline()){
+                requestData();
+            }
+            else{
+                Toast.makeText(getApplicationContext(),"NETWORK IS NOT AVAILABLE",Toast.LENGTH_SHORT).show();
+            }
             return true;
         }
         else if(id == R.id.action_logout){
@@ -86,17 +101,71 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     protected  void requestData(){
-        myTask task = new myTask();
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,"param 1","param 2","param 3");
+        Retrofit restAdapter = new Retrofit.Builder()
+                .baseUrl(ENDPOINT).addConverterFactory(GsonConverterFactory.create()).build();
+
+        AccidentsAPI api = restAdapter.create(AccidentsAPI.class);
+        Call<ArrayList<Accidents>> acc = api.soontobedecided();
+        acc.enqueue(new Callback<ArrayList<Accidents>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Accidents>> call, Response<ArrayList<Accidents>> response) {
+                accidentses = response;
+
+                try{
+                if (accidentses.body().size() < 0){
+                    Toast.makeText(getApplicationContext(),"There is no data",Toast.LENGTH_LONG).show();
+                }
+                else{
+                    Toast.makeText(getApplicationContext(),"There is data",Toast.LENGTH_LONG).show();
+                }
+
+                ArrayList<Accidents> accident = new ArrayList<Accidents>();
+                for (int i = 0; i < accidentses.body().size(); i++){
+                    accident.add(accidentses.body().get(i));
+                }
+                ArrayAdapter ap = new ArrayAdapter(getApplicationContext(),R.layout.accident_list,accident);
+                view.setAdapter(ap);
+                toastMaker("Task Completed");
+                }catch(Exception e){
+                    Toast.makeText(getApplicationContext(),"The list is null",Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Accidents>> call, Throwable t) {
+
+            }
+        });
+        /*api.groupList(new Call<ArrayList<Accidents>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Accidents>> call, Response<ArrayList<Accidents>> response) {
+                accidentses = response;
+                ArrayList<Accidents> accident = new ArrayList<Accidents>();
+                for (int i = 0; i < accidentses.body().size(); i++){
+                    accident.add(accidentses.body().get(i));
+                }
+                ArrayAdapter ap = new ArrayAdapter(getApplicationContext(),R.layout.accident_list,accident);
+                view.setAdapter(ap);
+                toastMaker("Task Completed");
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Accidents>> call, Throwable t) {
+
+            }
+        });
+        */
     }
-    private class myTask extends AsyncTask<String,String,String>{
+
+   /* private class myTask extends AsyncTask<RequestPackage,String,String>{
         @Override
         protected void onPreExecute() {
             //super.onPreExecute();
-            toastMaker("Task started");
+
         }
         @Override
-        protected String doInBackground(String... strings) {
+        protected String doInBackground(RequestPackage... strings) {
             return "task Complete";
         }
 
@@ -106,4 +175,5 @@ public class MainActivity extends AppCompatActivity {
             toastMaker(s);
         }
     }
+    */
 }

@@ -5,53 +5,19 @@ package pkc.trafficquest.sccapstone.trafficquest;
  */
 
 public class Accidents {
-    private String sTime;
-    private String endTime;
-    private int accidentId;
+    private int incidentId;
     private String description;
-    //private int numVehicles;
-    private int severity;
+    private String startTime;
+    private String endTime;
     private String lastModified;
-    private String Congestion;
-    public String getCongestion() {
-        return Congestion;
+    private String congestion;
+
+    public int getIncidentId() {
+        return incidentId;
     }
 
-    public void setCongestion(String congestion) {
-        Congestion = congestion;
-    }
-
-
-    public String getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(String lastModified) {
-        this.lastModified = lastModified;
-    }
-
-    public String getsTime() {
-        return sTime;
-    }
-
-    public void setsTime(String sTime) {
-        this.sTime = sTime;
-    }
-
-    public int getAccidentId() {
-        return accidentId;
-    }
-
-    public void setAccidentId(int accidentId) {
-        this.accidentId = accidentId;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
+    public void setIncidentId(int incidentId) {
+        this.incidentId = incidentId;
     }
 
     public String getDescription() {
@@ -62,15 +28,37 @@ public class Accidents {
         this.description = description;
     }
 
-    public int getSeverity() {
-        return severity;
+    public String getStartTime() {
+        return startTime;
     }
 
-    public void setSeverity(int severity) {
-        this.severity = severity;
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 
+    public String getEndTime() {
+        return endTime;
+    }
 
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(String lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public String getCongestion() {
+        return congestion;
+    }
+
+    public void setCongestion(String congestion) {
+        this.congestion = congestion;
+    }
 
 
 }
