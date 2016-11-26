@@ -3,9 +3,6 @@ package pkc.trafficquest.sccapstone.trafficquest;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by pkcho on 11/24/2016.
  */
@@ -39,7 +36,7 @@ public class Accidents {
     private String type;
     @SerializedName("incidentId")
     @Expose
-    private int incidentId;
+    private String incidentId;
     @SerializedName("description")
     @Expose
     private String description;
@@ -67,9 +64,9 @@ public class Accidents {
     @SerializedName("lane")
     @Expose
     private String lane;
-    @SerializedName("point")
-    @Expose
-    List<Point> points = new ArrayList<Point>();
+    //@SerializedName("point")
+    //@Expose
+    //List<Point> points = new ArrayList<Point>();
 
     public int getSource() {
         return source;
@@ -82,7 +79,7 @@ public class Accidents {
     @SerializedName("source")
     @Expose
     private  int source;
-
+/*
     public List<Point> getToPoint() {
         return toPoint;
     }
@@ -91,10 +88,11 @@ public class Accidents {
         this.toPoint = toPoint;
     }
 
+
     @SerializedName("toPoint")
     @Expose
     List<Point> toPoint = new ArrayList<Point>();
-
+*/
     public int getType2() {
         return type2;
     }
@@ -106,15 +104,17 @@ public class Accidents {
     @SerializedName("type")
     @Expose
     private int type2;
+/*
+public List<Point> getPoints() {
+       return points;
+   }
 
-    public List<Point> getPoints() {
-        return points;
-    }
+ */
 
-    public void setPoints(List<Point> points) {
+    /*public void setPoints(List<Point> points) {
         this.points = points;
     }
-
+*/
     public String getType() {
         return type;
     }
@@ -157,11 +157,11 @@ public class Accidents {
 
 
 
-    public int getIncidentId() {
+    public String getIncidentId() {
         return incidentId;
     }
 
-    public void setIncidentId(int incidentId) {
+    public void setIncidentId(String incidentId) {
         this.incidentId = incidentId;
     }
 

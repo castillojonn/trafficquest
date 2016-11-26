@@ -5,7 +5,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ResourceSet {
 
@@ -14,7 +13,7 @@ public class ResourceSet {
     private int estimatedTotal;
     @SerializedName("resources")
     @Expose
-    private List<Accidents> resources = new ArrayList<Accidents>();
+    private ArrayList<Accidents> resources = new ArrayList<Accidents>();
 
     /**
      * 
@@ -39,7 +38,7 @@ public class ResourceSet {
      * @return
      *     The resources
      */
-    public List<Accidents> getResources() {
+    public ArrayList<Accidents> getResources() {
         return resources;
     }
 
@@ -48,7 +47,7 @@ public class ResourceSet {
      * @param resources
      *     The resources
      */
-    public void setResources(List<Accidents> resources) {
+    public void setResources(ArrayList<Accidents> resources) {
         this.resources = resources;
     }
 

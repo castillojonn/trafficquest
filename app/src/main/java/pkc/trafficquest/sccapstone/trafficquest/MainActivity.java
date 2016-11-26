@@ -9,9 +9,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -104,15 +106,37 @@ public class MainActivity extends AppCompatActivity {
                 .baseUrl(ENDPOINT).addConverterFactory(GsonConverterFactory.create()).build();
 
         AccidentsAPI api = restAdapter.create(AccidentsAPI.class);
-        Call<RequestPackage> acc = api.soontobedecided();
+        final Call<RequestPackage> acc = api.soontobedecided();
         acc.enqueue(new Callback<RequestPackage>() {
             @Override
             public void onResponse(Call<RequestPackage> call, Response<RequestPackage> response) {
-                //RequestPackage res = response.body();
+                RequestPackage res = response.body();
                 //res = response.body();
                 try{
                     if(response!= null){
                         Toast.makeText(getApplicationContext(),"Message: "+response.message()+": "+response.code(),Toast.LENGTH_LONG).show();
+                        ArrayList<Accidents> accidents = new ArrayList<Accidents>();
+                        ArrayList<ResourceSet> rSet = new ArrayList<ResourceSet>();
+                        for (int i = 0; i<res.getResourceSets().size();i++){
+                            rSet.add(res.getResourceSets().get(i));
+                        }
+                        //ResourceSet rSetobj = new ResourceSet();
+                        for (int i = 0; i < rSet.size(); i++){
+                            ResourceSet rSetobj = new ResourceSet();
+                            rSetobj = rSet.get(i);
+                            accidents = rSetobj.getResources();
+                            ArrayList<String> names = new ArrayList<String>();
+                            for (int j = 0; j < accidents.size(); j++){
+                                Accidents accObj = new Accidents();
+                                accObj = accidents.get(j);
+                                names.add(accObj.getDescription());
+                            }
+                            ArrayAdapter ap = new ArrayAdapter(getApplicationContext(),R.layout.accident_list,names);
+                            view.setAdapter(ap);
+                            toastMaker("Task Completed");
+
+                        }
+
                     }
                     else{
                         Toast.makeText(getApplicationContext(),"Message: "+response.message()+": "+response.code(),Toast.LENGTH_LONG).show();
@@ -125,7 +149,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<RequestPackage> call, Throwable t) {
-                Toast.makeText(getApplicationContext(),call.toString()+"The request failed",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"Message: "+t.getMessage(),Toast.LENGTH_LONG).show();
+                Log.d("Message", t.getMessage());
+                t.printStackTrace();
             }
         });
         /*
