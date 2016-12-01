@@ -3,6 +3,8 @@ package pkc.trafficquest.sccapstone.trafficquest;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 /**
  * Created by pkcho on 11/24/2016.
  */

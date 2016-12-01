@@ -2,6 +2,7 @@ package pkc.trafficquest.sccapstone.trafficquest;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 
 /**
  * Created by Daniel Free on 11/9/2016.
