@@ -12,5 +12,10 @@
         android:orderInCategory="100"
         android:title="Logout"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_Maps"
+        android:orderInCategory="100"
+        android:title="Maps"
+        app:showAsAction="never" />
 
 </menu>

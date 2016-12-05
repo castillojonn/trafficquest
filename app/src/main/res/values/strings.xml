@@ -17,4 +17,5 @@
     </string>
     <string name="title_activity_sign_up">SignUpActivity</string>
     <string name="title_activity_sign_upor_login">SignUporLoginActivity</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
