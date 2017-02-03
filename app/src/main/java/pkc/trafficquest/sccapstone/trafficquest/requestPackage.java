@@ -10,7 +10,7 @@ import java.util.List;
  * Created by pkchoksi on 11/24/2016.
  */
 
-public class RequestPackage {
+class RequestPackage {
 
     @SerializedName("authenticationResultCode")
     @Expose
