@@ -24,13 +24,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private static final int ERROR_DIALOG_REQUEST = 9001;
     GoogleMap mMap;
-    private static final double
-            COLUMBIA_LAT = 33.99882,
-            COLUMBIA_LNG = -81.04537,
-            ATLANTA_LAT = 33.74831,
-            ATLANTA_LNG = -84.39111,
-            ORLANDO_LAT = 28.53823,
-            ORLANDO_LNG = -81.37739;
     private GoogleApiClient client;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +32,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
-        if (servicesOK()) {
+    /*    if (servicesOK()) {
             setContentView(R.layout.activity_maps);
             if (initMap()) {
                 Toast.makeText(this, "Ready to Map!", Toast.LENGTH_SHORT).show();
@@ -52,7 +45,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
         Toast.makeText(this, "Ready to Map!", Toast.LENGTH_SHORT).show();
-        gotoLocation(COLUMBIA_LAT, COLUMBIA_LNG, 10);
+        gotoLocation(COLUMBIA_LAT, COLUMBIA_LNG, 10);*/
     }
 
 
@@ -124,7 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          }
      }
      */
-    public Boolean servicesOK () {
+   /* public Boolean servicesOK () {
         int isAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (isAvailable == ConnectionResult.SUCCESS) {
             return true;
@@ -138,7 +131,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         return false;
-    }
+    }*/
     private boolean initMap() {
         if (mMap == null) {
             MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);

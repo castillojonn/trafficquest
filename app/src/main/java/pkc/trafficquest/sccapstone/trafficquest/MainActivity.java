@@ -73,14 +73,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Hello welcome to the code
         view = (ListView) findViewById(R.id.aListview);
 
-
-        if (googleServiceAvailable()) {
-            Toast.makeText(this, "Perfect!", Toast.LENGTH_LONG).show();
-            setContentView(R.layout.activity_maps);
-            initMap();
-        } else {
-            // No Google Maps Layout
-        }
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
@@ -149,10 +141,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             mAuth.signOut();
             startActivity(new Intent(getApplicationContext(), DispatchActivity.class));
             return true;
-        } else if (id == R.id.action_Maps) {
-            startActivity(new Intent(getApplicationContext(), MapsActivity.class));
-
-
+        } else if (id == R.id.action_Maps && googleServiceAvailable()) {
+            Toast.makeText(this, "Perfect!", Toast.LENGTH_LONG).show();
+            setContentView(R.layout.activity_maps);
+            initMap();
+        } else {
+            // No Google Maps Layout
         }
 
         return super.onOptionsItemSelected(item);
