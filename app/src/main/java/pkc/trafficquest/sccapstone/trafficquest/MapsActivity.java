@@ -39,7 +39,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
         if (servicesOK()) {
-            setContentView(R.layout.activity_map);
+            setContentView(R.layout.activity_maps);
             if (initMap()) {
                 Toast.makeText(this, "Ready to Map!", Toast.LENGTH_SHORT).show();
                 gotoLocation(COLUMBIA_LAT, COLUMBIA_LNG, 10);
