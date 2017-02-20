@@ -16,6 +16,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -50,6 +51,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         }
+        Toast.makeText(this, "Ready to Map!", Toast.LENGTH_SHORT).show();
+        gotoLocation(COLUMBIA_LAT, COLUMBIA_LNG, 10);
     }
 
 
