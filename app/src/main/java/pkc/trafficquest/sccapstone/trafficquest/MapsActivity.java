@@ -1,9 +1,12 @@
 package pkc.trafficquest.sccapstone.trafficquest;
 
 import android.app.Dialog;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
@@ -20,6 +23,9 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private static final int ERROR_DIALOG_REQUEST = 9001;
@@ -153,5 +159,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(update);
     }
 
+    //Action for the button on click, takes input from editText field and does a location
+    //  search with that input. Places a marker there and then sets camera over that location
+    public void onMapSearch(View view) {
+        EditText locationSearch = (EditText) findViewById(R.id.editText);
+        String location = locationSearch.getText().toString();
+        Geocoder geocoder = new Geocoder(this);
+        List<android.location.Address> addressList = null;
 
+        try {
+            addressList = geocoder.getFromLocationName(location, 1);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        android.location.Address address = addressList.get(0);
+        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+        mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+    }
 }
