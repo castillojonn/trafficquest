@@ -34,11 +34,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     GoogleMap mMap;
     private static final double
             COLUMBIA_LAT = 33.99882,
-            COLUMBIA_LNG = -81.04537,
-            ATLANTA_LAT = 33.74831,
-            ATLANTA_LNG = -84.39111,
-            ORLANDO_LAT = 28.53823,
-            ORLANDO_LNG = -81.37739;
+            COLUMBIA_LNG = -81.04537;
     private GoogleApiClient client;
 
     @Override
@@ -59,8 +55,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         }
-        Toast.makeText(this, "Ready to Map!", Toast.LENGTH_SHORT).show();
-        gotoLocation(COLUMBIA_LAT, COLUMBIA_LNG, 10);
+
     }
 
 
