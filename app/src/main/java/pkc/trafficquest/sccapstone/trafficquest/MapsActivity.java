@@ -179,3 +179,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
     }
 }
+
+   /*
+    private void gotoLocation(double lat, double lng) {
+        LatLng latLng = new LatLng(lat, lng);
+        CameraUpdate update = CameraUpdateFactory.newLatLng(latLng);
+        mMap.moveCamera(update);
+    }
+    private void gotoLocationZoom(double lat, double lng, float zoom) {
+        LatLng latLng = new LatLng(lat, lng);
+        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
+        mMap.moveCamera(update);
+    }
+
+
+    public void geoLocate(View view) throws IOException {
+        EditText et = (EditText) findViewById(R.id.editText);
+        String location = et.getText().toString();
+
+        Geocoder gc = new Geocoder(this);
+        List<android.location.Address> list = gc.getFromLocationName(location, 1);
+        android.location.Address address = list.get(0);
+        String locality = address.getLocality();
+
+        Toast.makeText(this, locality, Toast.LENGTH_LONG).show();
+
+        double lat = address.getLatitude();
+        double lng = address.getLongitude();
+        gotoLocationZoom(lat, lng, 15);
+
+
+    }
+}
+
+*/
