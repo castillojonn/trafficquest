@@ -29,6 +29,11 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        map:cameraTargetLat="33.99882"
+        map:cameraTargetLng="-81.04537"
+        map:cameraZoom="13"
+        map:uiZoomControls="false"
+        map:uiZoomGestures="true"
         tools:context="pkc.trafficquest.sccapstone.trafficquest.MapsActivity" />
 
 </LinearLayout>
