@@ -2,12 +2,11 @@ package pkc.trafficquest.sccapstone.trafficquest;
 
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * To work on unit tests, switch the Test Artifact in the Build Variants view.
  */
-
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
