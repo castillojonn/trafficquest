@@ -42,6 +42,9 @@ public class Accidents {
     @SerializedName("description")
     @Expose
     private String description;
+    @SerializedName("severity")
+    @Expose
+    private String severity;
     @SerializedName("start")
     @Expose
     private String start;
@@ -177,6 +180,12 @@ public List<Point> getPoints() {
 
     public String getStart() {
         return start;
+    }
+
+    public String getSeverity() { return severity; }
+
+    public void setSeverity(String severity) {
+        this.severity = severity;
     }
 
     public void setStart(String start) {
