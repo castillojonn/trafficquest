@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -77,20 +78,37 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (googleServiceAvailable()) {
             Toast.makeText(this, "Perfect!", Toast.LENGTH_LONG).show();
             setContentView(R.layout.activity_maps);
+            setOnSearchClickListener();
             initMap();
         } else {
             // No Google Maps Layout
         }
+
+
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
+
+
+    private void setOnSearchClickListener() {
+        findViewById(R.id.search_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
+
+
 
     private void initMap() {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.Maps);
         mapFragment.getMapAsync(this);
 
     }
+
+
 
     public boolean googleServiceAvailable() {
         GoogleApiAvailability api = GoogleApiAvailability.getInstance();
