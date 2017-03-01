@@ -134,8 +134,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        searchLatDouble = Double.parseDouble(searchLat.getText().toString()); // converts the contents of the EditText to a double
-        searchLngDouble = Double.parseDouble(searchLng.getText().toString());
+        if (!(searchLat.getText().toString().equals("")) && !(searchLng.getText().toString().equals(""))){
+            searchLatDouble = Double.parseDouble(searchLat.getText().toString()); // converts the contents of the EditText to a double
+            searchLngDouble = Double.parseDouble(searchLng.getText().toString());
+        }
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) { // if request data is pressed launch a new activity with the listview of traffic accidents
@@ -143,7 +145,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 isLogRequest = true;
                 Toast.makeText(this, "Results:", Toast.LENGTH_LONG).show();
                 requestData(searchLatDouble, searchLngDouble); // requests data by the lattitude and longitude entered in the editText fields
-                finish(); // ends the activity
             } else {
                 Toast.makeText(getApplicationContext(), "NETWORK IS NOT AVAILABLE", Toast.LENGTH_SHORT).show();
             }
@@ -155,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             startActivity(new Intent(getApplicationContext(), DispatchActivity.class));
             return true;
         } else if (id == R.id.action_Maps) {
+            //setContentView(R.layout.activity_maps);
             startActivity(new Intent(getApplicationContext(), MapsActivity.class));
         }
 
@@ -219,7 +221,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 names.add("Description: " + accObj.getDescription() +
                                         "\n Start time(epoch): " + accObj.getStart() +
                                         "\n End time(epoch): " + accObj.getEnd() +
-                                        "\n Severity: " + accObj.getSeverity());
+                                        "\n Severity: " + accObj.getSeverity() +
+                                        "\n Coordinates: " + accObj.getPoint().getCoordinates());
 
                             }
                             //mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).setValue(names); // stores the requested list into the database

@@ -69,8 +69,12 @@ public class Accidents {
     @SerializedName("lane")
     @Expose
     private String lane;
-    //@SerializedName("point")
-    //@Expose
+    @SerializedName("point")
+    @Expose
+    private Point point;
+    @SerializedName("toPoint")
+    @Expose
+    private ToPoint toPoint;
     //List<Point> points = new ArrayList<Point>();
 
     public int getSource() {
@@ -215,6 +219,14 @@ public List<Point> getPoints() {
     public void setRoadClosed(boolean roadClosed) {
         this.roadClosed = roadClosed;
     }
+
+    public Point getPoint(){ return point; }
+
+    public void setPoint(Point point) { this.point = point; }
+
+    public ToPoint getToPoint(){ return toPoint; }
+
+    public void setToPoint(ToPoint toPoint){ this.toPoint = toPoint; }
 
 
 }
