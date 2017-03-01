@@ -145,6 +145,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 isLogRequest = true;
                 Toast.makeText(this, "Results:", Toast.LENGTH_LONG).show();
                 requestData(searchLatDouble, searchLngDouble); // requests data by the lattitude and longitude entered in the editText fields
+                names.clear(); // clear the string list so it won't keep adding to the existing list
+                accidents.clear(); // clear the accident list
             } else {
                 Toast.makeText(getApplicationContext(), "NETWORK IS NOT AVAILABLE", Toast.LENGTH_SHORT).show();
             }
@@ -155,8 +157,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             mAuth.signOut();
             startActivity(new Intent(getApplicationContext(), DispatchActivity.class));
             return true;
-        } else if (id == R.id.action_Maps) {
-            //setContentView(R.layout.activity_maps);
+        } else if (id == R.id.action_Maps) { // launch maps activity
             startActivity(new Intent(getApplicationContext(), MapsActivity.class));
         }
 
