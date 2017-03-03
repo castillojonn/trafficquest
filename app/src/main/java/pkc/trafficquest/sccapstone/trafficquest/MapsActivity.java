@@ -1,12 +1,16 @@
 package pkc.trafficquest.sccapstone.trafficquest;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Geocoder;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -15,6 +19,7 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdate;
@@ -23,10 +28,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -36,15 +43,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             COLUMBIA_LAT = 33.99882,
             COLUMBIA_LNG = -81.04537;
     private GoogleApiClient client;
+    private ArrayList<Accidents> accidents; // list of accidents
+    private ArrayList<String> names; // String version of accident list
+    private double lat; // latitude
+    private double lng; // longitude
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maps);
+        Intent mapIntent = getIntent(); // get the intent
+        Bundle data = mapIntent.getExtras(); // bundle to receive data from the main activity
+        if (mapIntent.getExtras() != null){ // if the extras is not null, instantiate the accidents and names lists
+            accidents = data.getParcelableArrayList("accidentsList"); // gets the requested list of accidents from the main activity
+            names = mapIntent.getStringArrayListExtra("stringAccidentList"); // gets a String version of the requested accident list
+        }
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.Maps);
+        mapFragment.getMapAsync(this);
+    }
 
-        if (servicesOK()) {
+    // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+       /* client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+        if (googleServiceAvailable()) {
+            Toast.makeText(this, "Perfect!", Toast.LENGTH_LONG).show();
+            setContentView(R.layout.activity_maps);
+            initMap();
+        } else {
+            // No Google Maps Layout
+        }
+
+        /*if (servicesOK()) {
             setContentView(R.layout.activity_maps);
             if (initMap()) {
                 Toast.makeText(this, "Ready to Map!", Toast.LENGTH_SHORT).show();
@@ -54,9 +84,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
 
-        }
-
-    }
+        }*/
 
 
     /**
@@ -68,6 +96,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -95,8 +125,66 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         mMap.setMyLocationEnabled(true);
+        // loop through list, get coordinates, and place markers where accidents are
+        if (accidents != null) {
+            for (int i = 0; i < accidents.size(); i++) {
+                Accidents accident = accidents.get(i); // individual accident
+                // initialize coordinates from the requested accident list
+                lat = accident.getPoint().getCoordinates().get(0); // get latitude
+                lng = accident.getPoint().getCoordinates().get(1); // get longitude
+                LatLng searchLatLng = new LatLng(lat, lng);
+                mMap.addMarker(new MarkerOptions() // add markers from requested list
+                        .position(searchLatLng)
+                        .title("Type: " + interpretType2(accident)) // title of the marker is the type of accident
+                        .snippet(accident.getDescription() + "\n" // print description of the accident
+                                + "at " + lat + ", " + lng + "\n" // print latitude and longitude
+                                + "Start Time: " + accident.getStart() + "\n" // print the start time of the accident
+                                + "End Time: " + accident.getEnd() + "\n" // print the end time of the accident
+                                + "Severity: " + accident.getSeverity()) // print the severity of the accident
+                );
+
+            }
+        }
     }
-    public Action getIndexApiAction() {
+
+    /*
+    interprets what each type code means
+    @param acc The Accidents object to get the type code from
+    @return the interpreted type of accident
+     */
+    public String interpretType2(Accidents acc){
+        int type = acc.getType2(); // the type code from the accident
+        String typeString; // the value to return
+        switch (type) {
+            case 1: typeString = "Accident";
+                break;
+            case 2: typeString = "Congestion";
+                break;
+            case 3: typeString = "Disabled Vehicle";
+                break;
+            case 4: typeString = "Mass Transit";
+                break;
+            case 5: typeString = "Miscellaneous";
+                break;
+            case 6: typeString = "Other News";
+                break;
+            case 7: typeString = "Planned Event";
+                break;
+            case 8: typeString = "Road Hazard";
+                break;
+            case 9: typeString = "Construction";
+                break;
+            case 10: typeString = "Alert";
+                break;
+            case 11: typeString = "Weather";
+                break;
+            default: typeString = "Incorrect value";
+                break;
+        }
+        return typeString;
+    }
+
+ /*   public Action getIndexApiAction() {
         Thing object = new Thing.Builder()
                 .setName("Main Page") // TODO: Define a title for the content shown.
                 // TODO: Make sure this auto-generated URL is correct.
@@ -126,9 +214,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
-    }
+    }*/
 
-    /* private class myTask extends AsyncTask<RequestPackage,String,String>{
+   /*  private class myTask extends AsyncTask<RequestPackage,String,String> {
          @Override
          protected void onPreExecute() {
              //super.onPreExecute();
@@ -145,7 +233,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
              toastMaker(s);
          }
      }
-     */
+*/
+
+   /* public boolean googleServiceAvailable() {
+        GoogleApiAvailability api = GoogleApiAvailability.getInstance();
+        int isAvailable = api.isGooglePlayServicesAvailable(this);
+        if (isAvailable == ConnectionResult.SUCCESS) {
+            return true;
+        } else if (api.isUserResolvableError(isAvailable)) {
+            Dialog dialog = api.getErrorDialog(this, isAvailable, 0);
+            dialog.show();
+        } else {
+            Toast.makeText(this, "Can't Connect to play Services", Toast.LENGTH_LONG).show();
+        }
+        return false;
+    }*/
+
     public Boolean servicesOK () {
         int isAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (isAvailable == ConnectionResult.SUCCESS) {
@@ -163,7 +266,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
     private boolean initMap() {
         if (mMap == null) {
-            MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+            MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.Maps);
             mapFragment.getMapAsync(this);
         }
         return (mMap != null);
@@ -196,7 +299,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 }
 
-   /*
+/*
     private void gotoLocation(double lat, double lng) {
         LatLng latLng = new LatLng(lat, lng);
         CameraUpdate update = CameraUpdateFactory.newLatLng(latLng);
@@ -227,5 +330,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 }
+
 
 */

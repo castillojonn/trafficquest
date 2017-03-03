@@ -8,7 +8,7 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Point implements Parcelable {
+public class ToPoint implements Parcelable {
 
     @SerializedName("type")
     @Expose
@@ -54,7 +54,7 @@ public class Point implements Parcelable {
     }
 
 
-    protected Point(Parcel in) {
+    protected ToPoint(Parcel in) {
         type = in.readString();
         if (in.readByte() == 0x01) {
             coordinates = new ArrayList<Double>();
@@ -81,15 +81,15 @@ public class Point implements Parcelable {
     }
 
     @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Point> CREATOR = new Parcelable.Creator<Point>() {
+    public static final Parcelable.Creator<ToPoint> CREATOR = new Parcelable.Creator<ToPoint>() {
         @Override
-        public Point createFromParcel(Parcel in) {
-            return new Point(in);
+        public ToPoint createFromParcel(Parcel in) {
+            return new ToPoint(in);
         }
 
         @Override
-        public Point[] newArray(int size) {
-            return new Point[size];
+        public ToPoint[] newArray(int size) {
+            return new ToPoint[size];
         }
     };
 }

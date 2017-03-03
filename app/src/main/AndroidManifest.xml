@@ -19,14 +19,12 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true"/>
-
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-
 
 
     <application
@@ -43,8 +41,9 @@
             android:name=".LoginActivity"
             android:label="@string/title_activity_login">
         </activity>
-        <activity android:name=".MapsActivity"
-            android:label="Maps"/>
+        <activity
+            android:name=".MapsActivity"
+            android:label="@string/title_map" />
         <activity
             android:name=".SignUpActivity"
             android:label="@string/title_activity_sign_up"
@@ -62,7 +61,14 @@
             android:name=".SignUporLoginActivity"
             android:label="@string/title_activity_sign_upor_login"
             android:theme="@style/AppTheme.NoActionBar">
-        </activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+        </activity>
+        <activity
+            android:name=".LogActivity"
+            android:label="@string/title_activity_log"
+            android:theme="@style/AppTheme">
+        </activity>
+
+        <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"

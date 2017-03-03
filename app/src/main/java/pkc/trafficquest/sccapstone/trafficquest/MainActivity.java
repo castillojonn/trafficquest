@@ -12,7 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -30,7 +30,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,10 +47,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final String API_KEY = "AmJHdhFiW4EQCdWrgEoTk5-vo8zW-96v2LBmeBgnc0z_FV0Ru-gZizGCLfhtRtrJ";
     public static final String ENDPOINT = "http://dev.virtualearth.net";
     public static final String FIREBASE_URL = "https://trafficquest-9b525.firebaseio.com/";
+    public static final int REQUEST_CODE_LOG = 1;
     private FirebaseAuth mAuth;
-    Response<ArrayList<Accidents>> accidentses;
-    private ListView view;
+    private ArrayList<Accidents> accidents = new ArrayList<>(); // arraylist of accidents
+    private List<String> names = new ArrayList<String>(); // a list of strings used in the listview in LogActivity
+    Intent logIntent; // intent to launch LogActivity
+    Intent mapIntent; // intent to launch MapsActivity
     private DatabaseReference mDatabase; // reference to the Firebase
+    // text boxes to enter latitude and longitude to search
+    EditText searchLat;
+    EditText searchLng;
+    // double version of searchLat and searchLng
+    double searchLatDouble;
+    double searchLngDouble;
+    private boolean isLogRequest = false; // used to launch the log activity if true
+    private boolean isMapRequest = false; // used to launch the log activity if true
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -70,17 +85,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         GoogleMap mgoogleMap;
-        //Hello welcome to the code
-        view = (ListView) findViewById(R.id.aListview);
+        // Text boxes to enter the latitude and longitude to search
+        searchLat = (EditText) findViewById(R.id.editLattitude);
+        searchLng = (EditText) findViewById(R.id.editLongitude);
 
+        //view = (ListView) findViewById(R.id.aListview);
 
-        if (googleServiceAvailable()) {
-            Toast.makeText(this, "Perfect!", Toast.LENGTH_LONG).show();
-            setContentView(R.layout.activity_maps);
-            initMap();
-        } else {
-            // No Google Maps Layout
-        }
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
@@ -112,14 +122,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-
-
     // ATTENTION: This was auto-generated to implement the App Indexing API.
     // See https://g.co/AppIndexing/AndroidStudio for more information.
-
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -134,25 +138,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if (!(searchLat.getText().toString().equals("")) && !(searchLng.getText().toString().equals(""))){
+            searchLatDouble = Double.parseDouble(searchLat.getText().toString()); // converts the contents of the EditText to a double
+            searchLngDouble = Double.parseDouble(searchLng.getText().toString());
+        }
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_settings) { // if request data is pressed launch a new activity with the listview of traffic accidents
             if (isOnline()) {
-                requestData();
+                isLogRequest = true; // used in the requestData method to check if it is a request to display the log
+                Toast.makeText(this, "Results:", Toast.LENGTH_LONG).show();
+                requestData(searchLatDouble, searchLngDouble); // requests data by the lattitude and longitude entered in the editText fields
+                names.clear(); // clear the string list so it won't keep adding to the existing list
+                accidents.clear(); // clear the accident list
             } else {
                 Toast.makeText(getApplicationContext(), "NETWORK IS NOT AVAILABLE", Toast.LENGTH_SHORT).show();
             }
             return true;
-        } else if (id == R.id.action_logout) {
+        } else if (id == R.id.action_logout) { // if logout is pressed, sign the user out
             FirebaseUser user = mAuth.getCurrentUser();
             Toast.makeText(getApplicationContext(), user.getEmail().toString() + " has signed out", Toast.LENGTH_SHORT).show();
             mAuth.signOut();
             startActivity(new Intent(getApplicationContext(), DispatchActivity.class));
             return true;
-        } else if (id == R.id.action_Maps) {
-            startActivity(new Intent(getApplicationContext(), MapsActivity.class));
-
-
+        } else if (id == R.id.action_Maps) { // launch maps activity
+            if (searchLat.getText().toString().equals("") && searchLng.getText().toString().equals("")){ // if the text fields are empty, view the map with no request for data
+                startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+            }
+            else { // otherwise, assign isMapRequest true, request data from coordinates, then clear the lists being sent to MapsActivity
+                isMapRequest = true; // used in the requestData method to check if it is a request to check the query results in a map
+                requestData(searchLatDouble, searchLngDouble); // requests data by the lattitude and longitude entered in the editText fields
+                names.clear(); // clear the string list so it won't keep adding to the existing list
+                accidents.clear(); // clear the accident list
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -171,21 +189,36 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             return false;
         }
     }
-
-    protected void requestData() {
+    /*
+    Requests traffic incidents around the given latitude and longitude
+    and saves the accidents on Firebase
+    @param lat The latitude to search
+    @param lng The longitude to search
+     */
+    protected void requestData(double lat, double lng) {
         Retrofit restAdapter = new Retrofit.Builder()
                 .baseUrl(ENDPOINT).addConverterFactory(GsonConverterFactory.create()).build();
         AccidentsAPI api = restAdapter.create(AccidentsAPI.class);
-        final Call<RequestPackage> acc = api.soontobedecided();
+        logIntent = new Intent(getApplicationContext(), LogActivity.class);
+        mapIntent = new Intent(getApplicationContext(), MapsActivity.class);
+        double distanceLat = 160.934,
+               distanceLng = 160.934; // in km = 100 mi
+        distanceLat /= 110.574; // converts the distance to degrees latitude
+        distanceLng /= 111.32*Math.cos(Math.toDegrees(lat)); // converts the distance to degrees longitude
+        // coordinates used to search a bounding box of 100mi around the entered latitude and longitude
+        double southLat = lat - distanceLat;
+        double westLng = lng - distanceLng;
+        double northLat = lat + distanceLat;
+        double eastLng = lng + distanceLng;
+        Call<RequestPackage> acc = api.getIncidents(southLat,westLng,northLat,eastLng);
         acc.enqueue(new Callback<RequestPackage>() {
             @Override
             public void onResponse(Call<RequestPackage> call, Response<RequestPackage> response) {
                 RequestPackage res = response.body();
-                //res = response.body();
                 try {
                     if (response != null) {
                         Toast.makeText(getApplicationContext(), "Message: " + response.message() + ": " + response.code(), Toast.LENGTH_LONG).show();
-                        ArrayList<Accidents> accidents = new ArrayList<Accidents>();
+                        //ArrayList<Accidents> accidents = new ArrayList<Accidents>();
                         ArrayList<ResourceSet> rSet = new ArrayList<ResourceSet>();
                         for (int i = 0; i < res.getResourceSets().size(); i++) {
                             rSet.add(res.getResourceSets().get(i));
@@ -195,22 +228,40 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             ResourceSet rSetobj = new ResourceSet();
                             rSetobj = rSet.get(i);
                             accidents = rSetobj.getResources();
-                            ArrayList<String> names = new ArrayList<String>();
-                            for (int j = 0; j < accidents.size(); j++) {
-                                Accidents accObj = new Accidents();
-                                accObj = accidents.get(j);
-                                names.add(accObj.getDescription());
+                            //ArrayList<String> names = new ArrayList<String>();
+                            for (int j = 0; j < accidents.size(); j++) { // loop through accidents to add them to a list of Strings
+                                Accidents accObj /*= new Accidents()*/;
+                                accObj = accidents.get(j); // get accident j
+                                // adds the description, start and end time, severity, and coordinates of accident to a list of strings
+                                // that will be displayed in the listview
+                                names.add("Coordinates: " + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
+                                        + "," + accObj.getPoint().getCoordinates().get(1) + "\n"// add longitude to the list of Strings
+                                        + "Type: " + interpretType2(accObj) + "\n"
+                                        + "Description: " + accObj.getDescription()  + "\n" // add description to the list of Strings
+                                        + "Start time: " + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
+                                        + "End time: " + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
+                                        + "Severity: " + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
+                                        );
 
                             }
-                            ArrayAdapter ap = new ArrayAdapter(getApplicationContext(), R.layout.accident_list, names);
                             //mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).setValue(names); // stores the requested list into the database
                             mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).child("Accidents").setValue(accidents); // stores the requested list into the database
-
-                            view.setAdapter(ap);
                             toastMaker("Task Completed");
 
                         }
-
+                        logIntent.putStringArrayListExtra("accidentList", (ArrayList<String>) names); // places the names array so it can be displayed in a listview in LogActivity
+                        mapIntent.putStringArrayListExtra("stringAccidentList", (ArrayList<String>) names); // allows the mapsActivity to get the Sting list of accidents
+                        mapIntent.putExtra("accidentsList", accidents);
+                        // checks if the LogActivity needs to be launched based on if request data was pressed,
+                        // intended to prevent LogActivity from launching if another activity needs to use requestData
+                        if (isLogRequest && !isMapRequest){
+                            startActivity(logIntent);
+                            isLogRequest = false;
+                        }
+                        else if (isMapRequest && !isLogRequest){ // if the Maps option is selected
+                            startActivity(mapIntent);
+                            isMapRequest = false;
+                        }
                     } else {
                         Toast.makeText(getApplicationContext(), "Message: " + response.message() + ": " + response.code(), Toast.LENGTH_LONG).show();
                     }
@@ -227,59 +278,81 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+    }
 
-        /*
-        acc.enqueue(new Callback<ArrayList<RequestPackage>>() {
-            @Override
-            public void onResponse(Call<ArrayList<Accidents>> call, Response<ArrayList<Accidents>> response) {
-                accidentses = response;
+    /*
+    Interprets the time into a human readable format
+    @param t the string from the accident list to interpret
+    @return the converted time
+     */
+    public String interpretTime (String t) {
+        String timeString = t.substring(6, t.length()-2); // gets rid of the leading and trailing slashes and parenthesis
+        String date; // value to return
+        long time = Long.parseLong(timeString); // parse the string as a long
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy 'at' HH:mm:ss z"); // sets the format
+        date = sdf.format(new Date(time)); // sets the entered string as the SimpleDateFormat
 
-                try{
-                if (accidentses.body().size() < 0){
-                    Toast.makeText(getApplicationContext(),"There is no data",Toast.LENGTH_LONG).show();
-                }
-                else{
-                    Toast.makeText(getApplicationContext(),"There is data",Toast.LENGTH_LONG).show();
-                }
+        return date; // return the date
+    }
 
-                ArrayList<Accidents> accident = new ArrayList<Accidents>();
-                for (int i = 0; i < accidentses.body().size(); i++){
-                    accident.add(accidentses.body().get(i));
-                }
-                ArrayAdapter ap = new ArrayAdapter(getApplicationContext(),R.layout.accident_list,accident);
-                view.setAdapter(ap);
-                toastMaker("Task Completed");
-                }catch(Exception e){
-                    Toast.makeText(getApplicationContext(),"The list is null",Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
-            }
+    /*
+    Interprets the severity codes received from the request
+    @param acc the accident to get the severity data from
+    @return the interpreted severity code
+     */
+    public String interpretSeverity (Accidents acc) {
+        int severity = acc.getSeverity(); // the type code from the accident
+        String sevString; // the value to return
+        switch (severity) {
+            case 1: sevString = "Low Impact";
+                break;
+            case 2: sevString = "Minor";
+                break;
+            case 3: sevString = "Moderate";
+                break;
+            case 4: sevString = "Serious";
+                break;
+            default: sevString = "Incorrect value";
+                break;
+        }
+        return sevString; // return the severity code
+    }
 
-            @Override
-            public void onFailure(Call<ArrayList<Accidents>> call, Throwable t) {
-
-            }
-        });
-        */
-        /*api.groupList(new Call<ArrayList<Accidents>>() {
-            @Override
-            public void onResponse(Call<ArrayList<Accidents>> call, Response<ArrayList<Accidents>> response) {
-                accidentses = response;
-                ArrayList<Accidents> accident = new ArrayList<Accidents>();
-                for (int i = 0; i < accidentses.body().size(); i++){
-                    accident.add(accidentses.body().get(i));
-                }
-                ArrayAdapter ap = new ArrayAdapter(getApplicationContext(),R.layout.accident_list,accident);
-                view.setAdapter(ap);
-                toastMaker("Task Completed");
-            }
-
-            @Override
-            public void onFailure(Call<ArrayList<Accidents>> call, Throwable t) {
-
-            }
-        });
-        */
+    /*
+    interprets what each type code means
+    @param acc The Accidents object to get the type code from
+    @return the interpreted type of accident
+     */
+    public String interpretType2(Accidents acc){
+        int type = acc.getType2(); // the type code from the accident
+        String typeString; // the value to return
+        switch (type) {
+            case 1: typeString = "Accident";
+                break;
+            case 2: typeString = "Congestion";
+                break;
+            case 3: typeString = "Disabled Vehicle";
+                break;
+            case 4: typeString = "Mass Transit";
+                break;
+            case 5: typeString = "Miscellaneous";
+                break;
+            case 6: typeString = "Other News";
+                break;
+            case 7: typeString = "Planned Event";
+                break;
+            case 8: typeString = "Road Hazard";
+                break;
+            case 9: typeString = "Construction";
+                break;
+            case 10: typeString = "Alert";
+                break;
+            case 11: typeString = "Weather";
+                break;
+            default: typeString = "Incorrect value";
+                break;
+        }
+        return typeString;
     }
 
     public void saveData(ArrayList<Accidents> accList) {
@@ -287,8 +360,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mDatabase.child("users").child("Accidents").child("" + mAuth.getCurrentUser().getUid()).setValue(accList); // stores the requested list into the database
 
     }
-
-
 
 
     /**
@@ -325,6 +396,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == REQUEST_CODE_LOG){
+            if(resultCode == RESULT_OK){
+                data.getStringArrayListExtra("accidentList");
+            }
+        }
     }
 }
 
