@@ -27,9 +27,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Intent logIntent; // intent to launch LogActivity
     Intent mapIntent; // intent to launch MapsActivity
     private DatabaseReference mDatabase; // reference to the Firebase
+    private DatabaseReference mAccidentsReference;
+    private ValueEventListener mAccidentListener;
     // text boxes to enter latitude and longitude to search
     EditText searchLat;
     EditText searchLng;
@@ -81,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReferenceFromUrl(FIREBASE_URL); // reference to the Firebase path
+        mAccidentsReference = mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).child("Accidents");
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -250,6 +257,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         }
                         logIntent.putStringArrayListExtra("accidentList", (ArrayList<String>) names); // places the names array so it can be displayed in a listview in LogActivity
+                        logIntent.putExtra("logAccidentList", accidents);
                         mapIntent.putStringArrayListExtra("stringAccidentList", (ArrayList<String>) names); // allows the mapsActivity to get the Sting list of accidents
                         mapIntent.putExtra("accidentsList", accidents);
                         // checks if the LogActivity needs to be launched based on if request data was pressed,
@@ -359,6 +367,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mDatabase.child("users").child("Accidents").child("" + mAuth.getCurrentUser().getUid()).setValue(accList); // stores the requested list into the database
 
+    }
+
+    /*
+    Gets the results of the last query made that was saved to Firebase
+     */
+    public void getData() {
+        final ArrayList<Accidents> getAccidents;
+        Accidents acc;
+        ValueEventListener accidentListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Accidents getAccident = dataSnapshot.getValue(Accidents.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w("AccidentDetailActivity", "loadAccident:onCancelled", databaseError.toException());
+
+            }
+        };
+        mAccidentsReference.addValueEventListener(accidentListener);
     }
 
 

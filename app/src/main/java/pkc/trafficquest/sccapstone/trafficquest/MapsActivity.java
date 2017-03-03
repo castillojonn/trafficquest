@@ -126,8 +126,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         mMap.setMyLocationEnabled(true);
         // loop through list, get coordinates, and place markers where accidents are
-        if (accidents != null) {
-            for (int i = 0; i < accidents.size(); i++) {
+        if (accidents != null) { // checks to see if the arraylist of accidents is null, if not, proceed
+            for (int i = 0; i < accidents.size(); i++) { // loop through all accidents in the arraylist
                 Accidents accident = accidents.get(i); // individual accident
                 // initialize coordinates from the requested accident list
                 lat = accident.getPoint().getCoordinates().get(0); // get latitude
