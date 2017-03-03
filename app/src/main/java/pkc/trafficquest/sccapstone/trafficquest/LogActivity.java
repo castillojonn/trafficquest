@@ -4,10 +4,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,7 +31,7 @@ public class LogActivity extends AppCompatActivity {
             listView = (ListView) findViewById(R.id.aListview);
             listView.setAdapter(accAdapter);
         }
-
+        setOnClickListener();
 
        /* Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -47,14 +50,23 @@ public class LogActivity extends AppCompatActivity {
         //String fileName = "Stuff";
         //File csvFile = /*put csv creating code here*/;
         //Uri path = Uri.fromFile(csvFile);
-        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
         emailIntent.setType("text/plain");
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "TrafficQuest: CSV");
         emailIntent.putExtra(Intent.EXTRA_TEXT, "Here is a csv, as you requested.");
         //emailIntent.putExtra(Intent.EXTRA_STREAM, path);
 
         startActivity(Intent.createChooser(emailIntent, "Send email..."));
+        Toast.makeText(this, "Email Sent", Toast.LENGTH_SHORT).show();
+
     }
+    private void setOnClickListener() {
+        findViewById(R.id.buttonSend).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            }
+        });
+    }
+
 
     public void toastMaker(String toast) {
         Toast.makeText(getApplicationContext(), toast, Toast.LENGTH_SHORT).show();
