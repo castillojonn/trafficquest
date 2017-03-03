@@ -1,15 +1,19 @@
 package pkc.trafficquest.sccapstone.trafficquest;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by pkcho on 11/24/2016.
  */
 
-public class Accidents {
+public class Accidents implements Parcelable {
     /*
 
                "__type":"TrafficIncident:http:\/\/schemas.microsoft.com\/search\/local\/ws\/rest\/v1",
@@ -44,7 +48,7 @@ public class Accidents {
     private String description;
     @SerializedName("severity")
     @Expose
-    private String severity;
+    private int severity;
     @SerializedName("start")
     @Expose
     private String start;
@@ -75,6 +79,7 @@ public class Accidents {
     @SerializedName("toPoint")
     @Expose
     private ToPoint toPoint;
+
     //List<Point> points = new ArrayList<Point>();
 
     public int getSource() {
@@ -88,20 +93,20 @@ public class Accidents {
     @SerializedName("source")
     @Expose
     private  int source;
-/*
-    public List<Point> getToPoint() {
-        return toPoint;
-    }
+    /*
+        public List<Point> getToPoint() {
+            return toPoint;
+        }
 
-    public void setToPoint(List<Point> toPoint) {
-        this.toPoint = toPoint;
-    }
+        public void setToPoint(List<Point> toPoint) {
+            this.toPoint = toPoint;
+        }
 
 
-    @SerializedName("toPoint")
-    @Expose
-    List<Point> toPoint = new ArrayList<Point>();
-*/
+        @SerializedName("toPoint")
+        @Expose
+        List<Point> toPoint = new ArrayList<Point>();
+    */
     public int getType2() {
         return type2;
     }
@@ -186,9 +191,9 @@ public List<Point> getPoints() {
         return start;
     }
 
-    public String getSeverity() { return severity; }
+    public int getSeverity() { return severity; }
 
-    public void setSeverity(String severity) {
+    public void setSeverity(int severity) {
         this.severity = severity;
     }
 
@@ -229,4 +234,60 @@ public List<Point> getPoints() {
     public void setToPoint(ToPoint toPoint){ this.toPoint = toPoint; }
 
 
+    protected Accidents(Parcel in) {
+        type = in.readString();
+        incidentId = in.readString();
+        description = in.readString();
+        severity = in.readInt();
+        start = in.readString();
+        end = in.readString();
+        lastModified = in.readString();
+        roadClosed = in.readByte() != 0x00;
+        congestion = in.readString();
+        detour = in.readString();
+        verified = in.readByte() != 0x00;
+        lane = in.readString();
+        point = (Point) in.readValue(Point.class.getClassLoader());
+        toPoint = (ToPoint) in.readValue(ToPoint.class.getClassLoader());
+        source = in.readInt();
+        type2 = in.readInt();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(type);
+        dest.writeString(incidentId);
+        dest.writeString(description);
+        dest.writeInt(severity);
+        dest.writeString(start);
+        dest.writeString(end);
+        dest.writeString(lastModified);
+        dest.writeByte((byte) (roadClosed ? 0x01 : 0x00));
+        dest.writeString(congestion);
+        dest.writeString(detour);
+        dest.writeByte((byte) (verified ? 0x01 : 0x00));
+        dest.writeString(lane);
+        dest.writeValue(point);
+        dest.writeValue(toPoint);
+        dest.writeInt(source);
+        dest.writeInt(type2);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Accidents> CREATOR = new Parcelable.Creator<Accidents>() {
+        @Override
+        public Accidents createFromParcel(Parcel in) {
+            return new Accidents(in);
+        }
+
+        @Override
+        public Accidents[] newArray(int size) {
+            return new Accidents[size];
+        }
+    };
 }
