@@ -1,10 +1,12 @@
 package pkc.trafficquest.sccapstone.trafficquest;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -15,6 +17,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import com.google.firebase.auth.FirebaseAuth;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -41,7 +46,7 @@ public class LogActivity extends AppCompatActivity {
             csvString = createCSV(accidents);
             saveCSV(csvString);
         }
-
+        setOnClickListener();
 
        /* Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -185,6 +190,29 @@ public class LogActivity extends AppCompatActivity {
                 break;
         }
         return typeString;
+    }
+
+    //Will create an email intent, and send the requested csv file
+    //  after it creates it, to the email intent.
+    public void sendEmail() {
+        //String fileName = "Stuff";
+        //File csvFile = /*put csv creating code here*/;
+        //Uri path = Uri.fromFile(csvFile);
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+        emailIntent.setType("text/plain");
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "TrafficQuest: CSV");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "Here is a csv, as you requested.");
+        //emailIntent.putExtra(Intent.EXTRA_STREAM, path);
+
+        startActivity(Intent.createChooser(emailIntent, "Send email..."));
+        Toast.makeText(this, "Email Sent", Toast.LENGTH_SHORT).show();
+
+    }
+    private void setOnClickListener() {
+        findViewById(R.id.buttonSend).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            }
+        });
     }
 
 
