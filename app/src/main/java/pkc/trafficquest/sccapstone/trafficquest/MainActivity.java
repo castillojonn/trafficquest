@@ -27,6 +27,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,12 +55,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final int REQUEST_CODE_LOG = 1;
     private FirebaseAuth mAuth;
     private ArrayList<Accidents> accidents = new ArrayList<>(); // arraylist of accidents
+    private ArrayList<Accidents> getAccidents = new ArrayList<>();
     private List<String> names = new ArrayList<String>(); // a list of strings used in the listview in LogActivity
     Intent logIntent; // intent to launch LogActivity
     Intent mapIntent; // intent to launch MapsActivity
     private DatabaseReference mDatabase; // reference to the Firebase
     private DatabaseReference mAccidentsReference;
-    private ValueEventListener mAccidentListener;
+    Accidents newAccident;
     // text boxes to enter latitude and longitude to search
     EditText searchLat;
     EditText searchLng;
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReferenceFromUrl(FIREBASE_URL); // reference to the Firebase path
-        mAccidentsReference = mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).child("Accidents");
+        mAccidentsReference = mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).child("Accidents"); // reference to the users path of last requested accidents
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -177,6 +179,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 names.clear(); // clear the string list so it won't keep adding to the existing list
                 accidents.clear(); // clear the accident list
             }
+        }
+        else if (id == R.id.action_getFromFirebase) { // if get from Firebase is requested, get and display the last queried results
+            getDataFromFirebase();
         }
 
         return super.onOptionsItemSelected(item);
@@ -371,22 +376,47 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     /*
     Gets the results of the last query made that was saved to Firebase
      */
-    public void getData() {
-        final ArrayList<Accidents> getAccidents;
-        Accidents acc;
-        ValueEventListener accidentListener = new ValueEventListener() {
+    public void getDataFromFirebase() {
+        logIntent = new Intent(getApplicationContext(), LogActivity.class); // intent to launch log activity
+        mAccidentsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Accidents getAccident = dataSnapshot.getValue(Accidents.class);
+                for (DataSnapshot acc: dataSnapshot.getChildren()) { // loop through each child of Accidents in user's Firebase, add them to a different list
+                    Accidents getAccident = acc.getValue(Accidents.class);
+                    getAccidents.add(getAccident);
+                }
+                if (getAccidents.size() != 0) { // adds the results to a list of strings to display in the log activity, much like the request data method
+                    for (int i = 0; i < getAccidents.size(); i++) {
+                        Accidents accObj = getAccidents.get(i);
+                        names.add("Coordinates: " + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
+                                + "," + accObj.getPoint().getCoordinates().get(1) + "\n"// add longitude to the list of Strings
+                                + "Type: " + interpretType2(accObj) + "\n"
+                                + "Description: " + accObj.getDescription() + "\n" // add description to the list of Strings
+                                + "Start time: " + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
+                                + "End time: " + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
+                                + "Severity: " + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
+                        );
+                    }
+
+                    logIntent.putStringArrayListExtra("accidentList", (ArrayList<String>) names); // places the names array so it can be displayed in a listview in LogActivity
+                    logIntent.putExtra("logAccidentList", getAccidents);
+                    startActivity(logIntent); // starts log activity with the list of accidents saved on Firebase
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "list empty", Toast.LENGTH_SHORT).show();
+                }
+
+
+
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.w("AccidentDetailActivity", "loadAccident:onCancelled", databaseError.toException());
+                Toast.makeText(getApplicationContext(), "onCancelled called", Toast.LENGTH_SHORT).show();
 
             }
-        };
-        mAccidentsReference.addValueEventListener(accidentListener);
+        });
+
     }
 
 

@@ -9,12 +9,17 @@
         app:showAsAction="always" />
     <item
         android:id="@+id/action_Maps"
-        android:orderInCategory="100"
+        android:orderInCategory="101"
         android:title="Maps"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_getFromFirebase"
+        android:orderInCategory="102"
+        android:title="Get From Firebase"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_logout"
-        android:orderInCategory="101"
+        android:orderInCategory="103"
         android:title="Logout"
         app:showAsAction="never" />
 

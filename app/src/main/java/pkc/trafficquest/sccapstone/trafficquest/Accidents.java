@@ -37,6 +37,11 @@ public class Accidents implements Parcelable {
                "type":9,
                "verified":true
     */
+
+    public Accidents() {
+        // default constructor
+    }
+
     @SerializedName("__type")
     @Expose
     private String type;

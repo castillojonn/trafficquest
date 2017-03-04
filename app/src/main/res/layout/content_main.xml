@@ -32,10 +32,5 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         />
-    <Button
-        android:id="@+id/buttonSend"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:onClick="sendEmail"
-        android:text="Send Email" />
+
 </RelativeLayout>

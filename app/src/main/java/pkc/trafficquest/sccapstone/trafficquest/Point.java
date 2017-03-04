@@ -10,6 +10,10 @@ import com.google.gson.annotations.SerializedName;
 
 public class Point implements Parcelable {
 
+    public Point() {
+        // default constructor
+    }
+
     @SerializedName("type")
     @Expose
     private String type;
