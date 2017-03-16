@@ -36,6 +36,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private static final int ERROR_DIALOG_REQUEST = 9001;
     private static final String TRAFFICQUEST = "trafficquest";
@@ -326,6 +328,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        hideKeyboard();
                         saveSearch(editText.getText().toString(), address);
                         showSavedSnackbar(editText.getText().toString());
                     }
@@ -339,7 +342,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void showSavedSnackbar(String name) {
         Snackbar.make(findViewById(R.id.coordinatorlayout), getString(R.string.search_saved).replace("{name}", name),
-                Snackbar.LENGTH_INDEFINITE).show();
+                Snackbar.LENGTH_LONG).show();
     }
 
     private void saveSearch(String name, Address address) {
