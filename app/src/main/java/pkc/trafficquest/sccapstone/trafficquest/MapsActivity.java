@@ -83,11 +83,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
         if (searchItem != null) {
-            SearchView searchView = (SearchView) searchItem.getActionView();
+            final SearchView searchView = (SearchView) searchItem.getActionView();
             searchView.setMaxWidth(Integer.MAX_VALUE);
             searchView.setBackgroundColor(ContextCompat.getColor(this, android.R.color.white));
             searchView.setQueryHint(getString(R.string.search_location_here));
             searchView.setIconified(false);
+            searchView.setOnSearchClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onMapSearch(searchView);
+                }
+            });
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -309,9 +315,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //Action for the button on click, takes input from editText field and does a location
     //  search with that input. Places a marker there and then sets camera over that location
-    public void onMapSearch(View view) {
-        EditText locationSearch = (EditText) findViewById(R.id.editText);
-        String location = locationSearch.getText().toString();
+    public void onMapSearch(SearchView locationSearch) {
+        String location = locationSearch.getQuery().toString();
         Geocoder geocoder = new Geocoder(this);
         List<android.location.Address> addressList = null;
 
