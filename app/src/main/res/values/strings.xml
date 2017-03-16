@@ -21,4 +21,12 @@
     <string name="title_activity_log">Log</string>
     <string name="title_map">Map</string>
     <string name="no_address_found">No Address Found</string>
+    <string name="search_location_here">Search Location Here</string>
+    <string name="search">Search</string>
+    <string name="do_you_want_to_save_search">Do you want to save this search?</string>
+    <string name="save">Save</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="what_is_the_name_of_this_search">What is the name of this Search?</string>
+    <string name="save_search">Save Search</string>
+    <string name="search_saved">Search saved as {name}</string>
 </resources>

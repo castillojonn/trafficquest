@@ -1,14 +1,21 @@
 package pkc.trafficquest.sccapstone.trafficquest;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.*;
 import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -23,6 +30,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,6 +38,8 @@ import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private static final int ERROR_DIALOG_REQUEST = 9001;
+    private static final String TRAFFICQUEST = "trafficquest";
+
     GoogleMap mMap;
     private static final double
             COLUMBIA_LAT = 33.99882,
@@ -285,16 +295,68 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             e.printStackTrace();
         }
         if(addressList != null && !addressList.isEmpty()) {
-            showMarker(addressList.get(0));
+            Address address = addressList.get(0);
+            hideKeyboard();
+            showMarker(address);
+            showSaveSearchSnackbar(address);
         } else {
             Toast.makeText(this, R.string.no_address_found, Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void showSaveSearchSnackbar(final Address address) {
+        Snackbar.make(findViewById(R.id.coordinatorlayout), R.string.do_you_want_to_save_search,
+                Snackbar.LENGTH_INDEFINITE).setAction(R.string.save, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                askToNameSearch(address);
+            }
+        }).show();
+    }
+
+    private void askToNameSearch(final Address address) {
+        View view = LayoutInflater.from(this).inflate(R.layout.save_search_layout, null);
+
+        final EditText editText = (EditText) view.findViewById(R.id.search_edit_text);
+        editText.setText(address.getAddressLine(0));
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.save_search)
+                .setView(view)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        saveSearch(editText.getText().toString(), address);
+                        showSavedSnackbar(editText.getText().toString());
+                    }
+                }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        }).show();
+    }
+
+    private void showSavedSnackbar(String name) {
+        Snackbar.make(findViewById(R.id.coordinatorlayout), getString(R.string.search_saved).replace("{name}", name),
+                Snackbar.LENGTH_INDEFINITE).show();
+    }
+
+    private void saveSearch(String name, Address address) {
+        SharedPreferences.Editor prefs = getSharedPreferences(TRAFFICQUEST, MODE_PRIVATE).edit();
+        prefs.putString(name, new Gson().toJson(address));
+        prefs.apply();
     }
 
     private void showMarker(Address address) {
         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
         mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+    }
+
+    public  void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
     }
 }
 
