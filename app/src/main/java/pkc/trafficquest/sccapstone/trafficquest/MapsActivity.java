@@ -3,30 +3,22 @@ package pkc.trafficquest.sccapstone.trafficquest;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Geocoder;
-import android.net.Uri;
-import android.os.AsyncTask;
+import android.location.*;
+import android.location.Address;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -292,7 +284,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } catch (IOException e) {
             e.printStackTrace();
         }
-        android.location.Address address = addressList.get(0);
+        if(addressList != null && !addressList.isEmpty()) {
+            showMarker(addressList.get(0));
+        } else {
+            Toast.makeText(this, R.string.no_address_found, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void showMarker(Address address) {
         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
         mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
