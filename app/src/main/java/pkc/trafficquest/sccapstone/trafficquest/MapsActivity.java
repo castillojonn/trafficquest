@@ -16,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -88,10 +89,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             searchView.setBackgroundColor(ContextCompat.getColor(this, android.R.color.white));
             searchView.setQueryHint(getString(R.string.search_location_here));
             searchView.setIconified(false);
-            searchView.setOnSearchClickListener(new View.OnClickListener() {
+            searchView.setOnCloseListener(new SearchView.OnCloseListener() {
                 @Override
-                public void onClick(View v) {
+                public boolean onClose() {
+                    return true;
+                }
+            });
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    Log.e("Log", "Search");
                     onMapSearch(searchView);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    return false;
                 }
             });
         }
@@ -387,7 +401,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
     }
 
-    public  void hideKeyboard() {
+    public void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
     }
