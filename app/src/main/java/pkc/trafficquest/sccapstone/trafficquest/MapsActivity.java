@@ -12,8 +12,14 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -36,9 +42,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.content.Context.MODE_PRIVATE;
-
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final int ERROR_DIALOG_REQUEST = 9001;
     private static final String TRAFFICQUEST = "trafficquest";
 
@@ -56,6 +60,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_left);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setTitle(null);
+
         Intent mapIntent = getIntent(); // get the intent
         Bundle data = mapIntent.getExtras(); // bundle to receive data from the main activity
         if (mapIntent.getExtras() != null){ // if the extras is not null, instantiate the accidents and names lists
@@ -65,6 +75,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.Maps);
         mapFragment.getMapAsync(this);
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_maps, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        if (searchItem != null) {
+            SearchView searchView = (SearchView) searchItem.getActionView();
+            searchView.setMaxWidth(Integer.MAX_VALUE);
+            searchView.setBackgroundColor(ContextCompat.getColor(this, android.R.color.white));
+            searchView.setQueryHint(getString(R.string.search_location_here));
+            searchView.setIconified(false);
+        }
+        return super.onCreateOptionsMenu(menu);
     }
 
     // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -347,7 +372,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void saveSearch(String name, Address address) {
         SharedPreferences.Editor prefs = getSharedPreferences(TRAFFICQUEST, MODE_PRIVATE).edit();
-        prefs.putString(name, new Gson().toJson(address));
+        prefs.putString("saved_address:"+name, new Gson().toJson(address));
         prefs.apply();
     }
 
