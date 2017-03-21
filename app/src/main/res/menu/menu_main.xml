@@ -8,6 +8,11 @@
         android:title="RequestTrafficData"
         app:showAsAction="always" />
     <item
+        android:id="@+id/action_saved_locations"
+        android:orderInCategory="101"
+        android:title="Saved Locations"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_Maps"
         android:orderInCategory="101"
         android:title="Maps"

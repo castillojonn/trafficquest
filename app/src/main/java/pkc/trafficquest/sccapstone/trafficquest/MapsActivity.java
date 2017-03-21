@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -37,6 +36,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -56,6 +57,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<String> names; // String version of accident list
     private double lat; // latitude
     private double lng; // longitude
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             accidents = data.getParcelableArrayList("accidentsList"); // gets the requested list of accidents from the main activity
             names = mapIntent.getStringArrayListExtra("stringAccidentList"); // gets a String version of the requested accident list
         }
+
+        mDatabase = FirebaseDatabase.getInstance().getReferenceFromUrl(MainActivity.FIREBASE_URL); // reference to the Firebase path
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.Maps);
         mapFragment.getMapAsync(this);
@@ -390,9 +394,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void saveSearch(String name, Address address) {
-        SharedPreferences.Editor prefs = getSharedPreferences(TRAFFICQUEST, MODE_PRIVATE).edit();
-        prefs.putString("saved_address:"+name, new Gson().toJson(address));
-        prefs.apply();
+        mDatabase.setValue("saved_address:"+name, new Gson().toJson(address));
     }
 
     private void showMarker(Address address) {
