@@ -7,9 +7,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -89,8 +92,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mAccidentsReference = mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).child("Accidents"); // reference to the users path of last requested accidents
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setUpToolbar();
 
         GoogleMap mgoogleMap;
         // Text boxes to enter the latitude and longitude to search
@@ -103,10 +105,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
+    @SuppressWarnings("ConstantConditions")
+    private void setUpToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.setNavigationIcon(R.drawable.menu);
+
+        connectMenu();
+    }
+
+    private void connectMenu() {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.getMenu().findItem(R.id.menu_saved_searches).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawerLayout.closeDrawer(Gravity.LEFT);
+                startActivity(new Intent(MainActivity.this, SavedSearchesActivity.class));
+                return false;
+            }
+        });
+    }
+
     private void initMap() {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.Maps);
         mapFragment.getMapAsync(this);
-
     }
 
     public boolean googleServiceAvailable() {

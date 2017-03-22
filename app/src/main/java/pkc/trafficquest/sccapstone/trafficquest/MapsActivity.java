@@ -38,7 +38,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -394,7 +393,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void saveSearch(String name, Address address) {
-        mDatabase.setValue("saved_address:"+name, new Gson().toJson(address));
+        mDatabase.child("addresses").child(name).setValue(address);
     }
 
     private void showMarker(Address address) {
