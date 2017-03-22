@@ -102,6 +102,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             names = mapIntent.getStringArrayListExtra("stringAccidentList"); // gets a String version of the requested accident list
         }
 
+        hideKeyboard();
+
         mDatabase = FirebaseDatabase.getInstance().getReferenceFromUrl(MainActivity.FIREBASE_URL); // reference to the Firebase path
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.Maps);
@@ -125,9 +127,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng latLng) {
+                    mMap.clear();
+
                     mCurrentLocation = new pkc.trafficquest.sccapstone.trafficquest.Address();
                     mCurrentLocation.setLat(latLng.latitude);
                     mCurrentLocation.setLng(latLng.longitude);
+
+                    mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
                 }
             });
         }
