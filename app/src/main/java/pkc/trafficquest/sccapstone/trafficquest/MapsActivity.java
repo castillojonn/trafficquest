@@ -171,7 +171,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        Log.e("Main", "Addreess " + mAddress);
         if(mAddress != null) {
             hideKeyboard();
 
