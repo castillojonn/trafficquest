@@ -18,7 +18,22 @@ public class Address {
     @SerializedName("locality")
     @Expose
     private String locality;
+    @SerializedName("name")
+    @Expose
+    private String name;
 
+
+    public Address() {
+
+    }
+
+    public Address(String name, android.location.Address address) {
+        adminDistrict = address.getAdminArea();
+        countryRegion = address.getCountryName();
+        formattedAddress = address.getAddressLine(0);
+        locality = address.getLocality();
+        this.name = name;
+    }
     /**
      * 
      * @return
@@ -91,4 +106,17 @@ public class Address {
         this.locality = locality;
     }
 
+    @Override
+    public String toString() {
+        return "Address{" +
+                "adminDistrict='" + adminDistrict + '\'' +
+                ", countryRegion='" + countryRegion + '\'' +
+                ", formattedAddress='" + formattedAddress + '\'' +
+                ", locality='" + locality + '\'' +
+                '}';
+    }
+
+    public String getName() {
+        return name;
+    }
 }

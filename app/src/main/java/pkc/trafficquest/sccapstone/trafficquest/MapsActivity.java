@@ -393,7 +393,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void saveSearch(String name, Address address) {
-        mDatabase.child("addresses").child(name).setValue(address);
+        mDatabase.child("addresses").child(name).setValue(new pkc.trafficquest.sccapstone.trafficquest.Address(name, address));
     }
 
     private void showMarker(Address address) {
