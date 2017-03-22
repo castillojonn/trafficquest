@@ -46,6 +46,7 @@ import java.util.List;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final int ERROR_DIALOG_REQUEST = 9001;
     private static final String TRAFFICQUEST = "trafficquest";
+    private static final String ADDRESS = "address";
 
     GoogleMap mMap;
     private static final double
@@ -57,11 +58,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double lat; // latitude
     private double lng; // longitude
     private DatabaseReference mDatabase;
+    private pkc.trafficquest.sccapstone.trafficquest.Address mAddress;
+
+    public static Intent getIntent(Context context, pkc.trafficquest.sccapstone.trafficquest.Address address) {
+        Intent intent = new Intent(context, MapsActivity.class);
+        intent.putExtra(ADDRESS, address);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        if(getIntent() != null) {
+            if(getIntent().getExtras() != null) {
+                mAddress = (pkc.trafficquest.sccapstone.trafficquest.Address) getIntent().getExtras().getSerializable(ADDRESS);
+            }
+        }
 
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_left);
@@ -102,7 +116,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     Log.e("Log", "Search");
-                    onMapSearch(searchView);
+                    if(mMap != null) {
+                        mMap.clear();
+                        onMapSearch(searchView);
+                    }
                     return true;
                 }
 
@@ -153,6 +170,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        Log.e("Main", "Addreess " + mAddress);
+        if(mAddress != null) {
+            hideKeyboard();
+
+            final LatLng latLng = new LatLng(mAddress.getLat(), mAddress.getLng());
+            mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+        }
 
         // Add a marker in Sydney and move the camera
         //LatLng sydney = new LatLng(-34, 151);
@@ -375,9 +401,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        hideKeyboard();
                         saveSearch(editText.getText().toString(), address);
                         showSavedSnackbar(editText.getText().toString());
+                        hideKeyboard();
                     }
                 }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             @Override

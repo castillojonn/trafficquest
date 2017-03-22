@@ -30,6 +30,7 @@ public class SavedSearchesActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_left);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
         mDatabase = FirebaseDatabase.getInstance().getReferenceFromUrl(MainActivity.FIREBASE_URL).child("addresses");
@@ -54,7 +55,15 @@ public class SavedSearchesActivity extends AppCompatActivity {
     private void setUpRecycler(List<Address> addresses) {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        recyclerView.setAdapter(new SavedSearchesAdapter(addresses));
+        SavedSearchesAdapter adapter = new SavedSearchesAdapter(addresses);
+        adapter.setOnItemClickListener(new SavedSearchesAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(Address address) {
+                startActivity(MapsActivity.getIntent(SavedSearchesActivity.this, address));
+            }
+        });
+        recyclerView.setAdapter(adapter);
+
     }
 
 }

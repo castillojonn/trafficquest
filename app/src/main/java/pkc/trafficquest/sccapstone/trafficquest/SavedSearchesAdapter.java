@@ -16,6 +16,8 @@ public class SavedSearchesAdapter extends RecyclerView.Adapter<SavedSearchesAdap
 
     private final List<Address> mAddresses;
 
+    private OnItemClickListener mOnClick;
+
     public SavedSearchesAdapter(List<Address> addresses) {
         mAddresses = addresses;
     }
@@ -28,12 +30,31 @@ public class SavedSearchesAdapter extends RecyclerView.Adapter<SavedSearchesAdap
 
     @Override
     public void onBindViewHolder(SavedSearchesAdapter.ViewHolder holder, int position) {
-        holder.textView.setText(mAddresses.get(position).getName());
+        final Address address = mAddresses.get(position);
+        holder.textView.setText(address.getName());
+        holder.textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mOnClick != null) {
+                    mOnClick.onClick(address);
+                }
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return mAddresses.size();
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        mOnClick = onItemClickListener;
+    }
+
+    public interface OnItemClickListener {
+
+        void onClick(Address address);
+
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
