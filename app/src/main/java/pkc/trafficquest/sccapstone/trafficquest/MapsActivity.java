@@ -1,5 +1,6 @@
 package pkc.trafficquest.sccapstone.trafficquest;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -9,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -47,6 +49,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int ERROR_DIALOG_REQUEST = 9001;
     private static final String TRAFFICQUEST = "trafficquest";
     private static final String ADDRESS = "address";
+    private static final String PICK_LOCATION = "picklocation";
+    public static final String LOCATION = "location";
 
     GoogleMap mMap;
     private static final double
@@ -59,6 +63,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double lng; // longitude
     private DatabaseReference mDatabase;
     private pkc.trafficquest.sccapstone.trafficquest.Address mAddress;
+    private boolean mPickLocation = false;
+    private pkc.trafficquest.sccapstone.trafficquest.Address mCurrentLocation;
+
+    public static Intent getIntent(Context context, boolean pickLocation) {
+        Intent intent = new Intent(context, MapsActivity.class);
+        intent.putExtra(PICK_LOCATION, pickLocation);
+        return intent;
+    }
 
     public static Intent getIntent(Context context, pkc.trafficquest.sccapstone.trafficquest.Address address) {
         Intent intent = new Intent(context, MapsActivity.class);
@@ -74,6 +86,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(getIntent() != null) {
             if(getIntent().getExtras() != null) {
                 mAddress = (pkc.trafficquest.sccapstone.trafficquest.Address) getIntent().getExtras().getSerializable(ADDRESS);
+                mPickLocation = getIntent().getExtras().getBoolean(PICK_LOCATION);
             }
         }
 
@@ -93,6 +106,31 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.Maps);
         mapFragment.getMapAsync(this);
+    }
+
+    private void connectSearchIfNeeded() {
+        if(mPickLocation) {
+            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.select_button);
+            fab.setVisibility(View.VISIBLE);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent();
+                    intent.putExtra(LOCATION, mCurrentLocation);
+                    setResult(Activity.RESULT_OK, intent);
+                    finish();
+                }
+            });
+
+            mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    mCurrentLocation = new pkc.trafficquest.sccapstone.trafficquest.Address();
+                    mCurrentLocation.setLat(latLng.latitude);
+                    mCurrentLocation.setLng(latLng.longitude);
+                }
+            });
+        }
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -170,6 +208,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        connectSearchIfNeeded();
 
         if(mAddress != null) {
             hideKeyboard();
@@ -373,9 +413,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             hideKeyboard();
             showMarker(address);
             showSaveSearchSnackbar(address);
+            setCurrentLocation(address);
         } else {
             Toast.makeText(this, R.string.no_address_found, Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void setCurrentLocation(Address address) {
+        mCurrentLocation = new pkc.trafficquest.sccapstone.trafficquest.Address();
+        mCurrentLocation.setLat(address.getLatitude());
+        mCurrentLocation.setLng(address.getLongitude());
     }
 
     private void showSaveSearchSnackbar(final Address address) {

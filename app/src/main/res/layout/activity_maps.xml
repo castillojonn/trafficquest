@@ -31,4 +31,14 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"/>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/select_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:backgroundTint="@color/colorPrimary"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/check"
+        android:visibility="gone"/>
+
 </android.support.design.widget.CoordinatorLayout>

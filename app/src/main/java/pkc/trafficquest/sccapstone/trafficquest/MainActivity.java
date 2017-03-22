@@ -1,6 +1,7 @@
 package pkc.trafficquest.sccapstone.trafficquest;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final String ENDPOINT = "http://dev.virtualearth.net";
     public static final String FIREBASE_URL = "https://trafficquest-9b525.firebaseio.com/";
     public static final int REQUEST_CODE_LOG = 1;
+    private static final int SELECT_LOCATION_REQUEST_CODE = 100;
     private FirebaseAuth mAuth;
     private ArrayList<Accidents> accidents = new ArrayList<>(); // arraylist of accidents
     private ArrayList<Accidents> getAccidents = new ArrayList<>();
@@ -118,6 +120,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .build();
 
         connectHereButton();
+        connectPickFromMap();
+    }
+
+    private void connectPickFromMap() {
+        findViewById(R.id.pick_from_map).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(MapsActivity.getIntent(MainActivity.this, true),
+                        SELECT_LOCATION_REQUEST_CODE);
+            }
+        });
     }
 
     private void connectHereButton() {
@@ -528,11 +541,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_CODE_LOG){
-            if(resultCode == RESULT_OK){
+        if(resultCode == Activity.RESULT_OK) {
+            if(requestCode == REQUEST_CODE_LOG){
                 data.getStringArrayListExtra("accidentList");
             }
+
+            if(requestCode == SELECT_LOCATION_REQUEST_CODE) {
+                setCurrentLocation((Address)data.getSerializableExtra(MapsActivity.LOCATION));
+            }
         }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void setCurrentLocation(Address address) {
+        searchLat.setText(Double.toString(address.getLat()));
+        searchLng.setText(Double.toString(address.getLng()));
     }
 
     @Override
