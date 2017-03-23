@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="pkc.trafficquest.sccapstone.trafficquest.MainActivity">
+    tools:context="pkc.trafficquest.sccapstone.trafficquest.SavedSearchesActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -21,25 +20,10 @@
 
     </android.support.design.widget.AppBarLayout>
 
-
-    <android.support.v4.widget.DrawerLayout
-        android:id="@+id/drawer_layout"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-        <include layout="@layout/content_log" />
-
-        <android.support.design.widget.NavigationView
-            android:id="@+id/nav_view"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:paddingTop="28dp"
-            app:menu="@menu/drawer_view" />
-
-    </android.support.v4.widget.DrawerLayout>
-
-
-    <!-- <include layout="@layout/content_main" /> -->
-
- </android.support.design.widget.CoordinatorLayout>
+</android.support.design.widget.CoordinatorLayout>

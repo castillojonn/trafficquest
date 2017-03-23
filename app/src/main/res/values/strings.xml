@@ -29,4 +29,5 @@
     <string name="what_is_the_name_of_this_search">What is the name of this Search?</string>
     <string name="save_search">Save Search</string>
     <string name="search_saved">Search saved as {name}</string>
+    <string name="saved_searches">Saved Searches</string>
 </resources>

@@ -1,15 +1,16 @@
 package pkc.trafficquest.sccapstone.trafficquest;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -37,7 +38,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.gson.Gson;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,6 +48,9 @@ import java.util.List;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final int ERROR_DIALOG_REQUEST = 9001;
     private static final String TRAFFICQUEST = "trafficquest";
+    private static final String ADDRESS = "address";
+    private static final String PICK_LOCATION = "picklocation";
+    public static final String LOCATION = "location";
 
     GoogleMap mMap;
     private static final double
@@ -56,11 +61,34 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<String> names; // String version of accident list
     private double lat; // latitude
     private double lng; // longitude
+    private DatabaseReference mDatabase;
+    private pkc.trafficquest.sccapstone.trafficquest.Address mAddress;
+    private boolean mPickLocation = false;
+    private pkc.trafficquest.sccapstone.trafficquest.Address mCurrentLocation;
+
+    public static Intent getIntent(Context context, boolean pickLocation) {
+        Intent intent = new Intent(context, MapsActivity.class);
+        intent.putExtra(PICK_LOCATION, pickLocation);
+        return intent;
+    }
+
+    public static Intent getIntent(Context context, pkc.trafficquest.sccapstone.trafficquest.Address address) {
+        Intent intent = new Intent(context, MapsActivity.class);
+        intent.putExtra(ADDRESS, address);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        if(getIntent() != null) {
+            if(getIntent().getExtras() != null) {
+                mAddress = (pkc.trafficquest.sccapstone.trafficquest.Address) getIntent().getExtras().getSerializable(ADDRESS);
+                mPickLocation = getIntent().getExtras().getBoolean(PICK_LOCATION);
+            }
+        }
 
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_left);
@@ -74,8 +102,42 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             names = mapIntent.getStringArrayListExtra("stringAccidentList"); // gets a String version of the requested accident list
         }
 
+        hideKeyboard();
+
+        mDatabase = FirebaseDatabase.getInstance().getReferenceFromUrl(MainActivity.FIREBASE_URL); // reference to the Firebase path
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.Maps);
         mapFragment.getMapAsync(this);
+    }
+
+    private void connectSearchIfNeeded() {
+        if(mPickLocation) {
+            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.select_button);
+            fab.setVisibility(View.VISIBLE);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent();
+                    intent.putExtra(LOCATION, mCurrentLocation);
+                    setResult(Activity.RESULT_OK, intent);
+                    finish();
+                }
+            });
+
+            mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    mMap.clear();
+
+                    mCurrentLocation = new pkc.trafficquest.sccapstone.trafficquest.Address();
+                    mCurrentLocation.setLat(latLng.latitude);
+                    mCurrentLocation.setLng(latLng.longitude);
+
+                    mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                }
+            });
+        }
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -99,7 +161,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     Log.e("Log", "Search");
-                    onMapSearch(searchView);
+                    if(mMap != null) {
+                        mMap.clear();
+                        onMapSearch(searchView);
+                    }
                     return true;
                 }
 
@@ -150,6 +215,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        connectSearchIfNeeded();
+
+        if(mAddress != null) {
+            hideKeyboard();
+
+            final LatLng latLng = new LatLng(mAddress.getLat(), mAddress.getLng());
+            mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+        }
 
         // Add a marker in Sydney and move the camera
         //LatLng sydney = new LatLng(-34, 151);
@@ -345,9 +420,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             hideKeyboard();
             showMarker(address);
             showSaveSearchSnackbar(address);
+            setCurrentLocation(address);
         } else {
             Toast.makeText(this, R.string.no_address_found, Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void setCurrentLocation(Address address) {
+        mCurrentLocation = new pkc.trafficquest.sccapstone.trafficquest.Address();
+        mCurrentLocation.setLat(address.getLatitude());
+        mCurrentLocation.setLng(address.getLongitude());
     }
 
     private void showSaveSearchSnackbar(final Address address) {
@@ -372,9 +454,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        hideKeyboard();
                         saveSearch(editText.getText().toString(), address);
                         showSavedSnackbar(editText.getText().toString());
+                        hideKeyboard();
                     }
                 }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
@@ -390,9 +472,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void saveSearch(String name, Address address) {
-        SharedPreferences.Editor prefs = getSharedPreferences(TRAFFICQUEST, MODE_PRIVATE).edit();
-        prefs.putString("saved_address:"+name, new Gson().toJson(address));
-        prefs.apply();
+        mDatabase.child("addresses").child(name).setValue(new pkc.trafficquest.sccapstone.trafficquest.Address(name, address));
     }
 
     private void showMarker(Address address) {

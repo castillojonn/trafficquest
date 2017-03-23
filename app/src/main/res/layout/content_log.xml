@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="?attr/actionBarSize">
+
+    <Button
+        android:id="@+id/here_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Here"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="24dp"
+        android:layout_marginRight="24dp"/>
 
     <EditText
         android:id="@+id/editLattitude"
@@ -21,5 +33,13 @@
         android:inputType="numberSigned|numberDecimal"
         android:hint="Longitude" />
 
+    <Button
+        android:id="@+id/pick_from_map"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pick from Map"
+        android:layout_below="@+id/editLongitude"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp"/>
 
 </RelativeLayout>

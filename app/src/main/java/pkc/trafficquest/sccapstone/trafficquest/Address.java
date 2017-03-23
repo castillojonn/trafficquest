@@ -4,7 +4,9 @@ package pkc.trafficquest.sccapstone.trafficquest;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Address {
+import java.io.Serializable;
+
+public class Address implements Serializable {
 
     @SerializedName("adminDistrict")
     @Expose
@@ -18,7 +20,30 @@ public class Address {
     @SerializedName("locality")
     @Expose
     private String locality;
+    @SerializedName("name")
+    @Expose
+    private String name;
+    @SerializedName("lat")
+    @Expose
+    private Double lat;
+    @SerializedName("lng")
+    @Expose
+    private Double lng;
 
+
+    public Address() {
+
+    }
+
+    public Address(String name, android.location.Address address) {
+        adminDistrict = address.getAdminArea();
+        countryRegion = address.getCountryName();
+        formattedAddress = address.getAddressLine(0);
+        locality = address.getLocality();
+        this.name = name;
+        lat = address.getLatitude();
+        lng = address.getLongitude();
+    }
     /**
      * 
      * @return
@@ -91,4 +116,37 @@ public class Address {
         this.locality = locality;
     }
 
+    @Override
+    public String toString() {
+        return "Address{" +
+                "adminDistrict='" + adminDistrict + '\'' +
+                ", countryRegion='" + countryRegion + '\'' +
+                ", formattedAddress='" + formattedAddress + '\'' +
+                ", locality='" + locality + '\'' +
+                '}';
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getLat() {
+        return lat;
+    }
+
+    public void setLat(Double lat) {
+        this.lat = lat;
+    }
+
+    public Double getLng() {
+        return lng;
+    }
+
+    public void setLng(Double lng) {
+        this.lng = lng;
+    }
 }
