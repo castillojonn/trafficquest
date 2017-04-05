@@ -2,13 +2,11 @@ package pkc.trafficquest.sccapstone.trafficquest;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -19,9 +17,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import com.google.firebase.auth.FirebaseAuth;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -35,6 +30,7 @@ public class LogActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_log);
         Intent logIntent = getIntent();
         Bundle data = logIntent.getExtras();
@@ -46,6 +42,7 @@ public class LogActivity extends AppCompatActivity {
             listView = (ListView) findViewById(R.id.aListview);
             listView.setAdapter(accAdapter);
             csvString = createCSV(accidents); // makes a csv out of the list of accidents
+
         }
 
        /* Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -261,5 +258,7 @@ public class LogActivity extends AppCompatActivity {
 
     public void toastMaker(String toast) {
         Toast.makeText(getApplicationContext(), toast, Toast.LENGTH_SHORT).show();
+
+
     }
 }
