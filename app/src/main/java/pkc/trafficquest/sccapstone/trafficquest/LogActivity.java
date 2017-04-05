@@ -92,6 +92,10 @@ public class LogActivity extends AppCompatActivity {
                     interpretTime(accident.getStart()) + "," + // add the start time of accident to list
                     interpretTime(accident.getEnd()) + "," + // add the end time of accident to list
                     interpretType2(accident) + "\n"; // add the type of the accident to the list (accident, weather, hazard, etc.) and go to next line
+            String data=interpretTime(accident.getStart());
+            String[] parts = data.split(":");
+            String part1 = parts[0]; //contains the title
+            String part2 = parts[1]; //your data
         }
         return csv; // return the String in csv format
     }
@@ -143,7 +147,7 @@ public class LogActivity extends AppCompatActivity {
         String timeString = t.substring(6, t.length()-2); // gets rid of the leading and trailing slashes and parenthesis
         String date; // value to return
         long time = Long.parseLong(timeString); // parse the string as a long
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy 'at' HH:mm:ss z"); // sets the format
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy 'at' HH:mm z"); // sets the format
         date = sdf.format(new Date(time)); // sets the entered string as the SimpleDateFormat
 
         return date; // return the date
