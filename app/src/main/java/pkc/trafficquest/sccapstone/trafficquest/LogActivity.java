@@ -45,13 +45,7 @@ public class LogActivity extends AppCompatActivity {
 
         }
 
-       /* Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        GoogleMap mgoogleMap;
-        //Hello welcome to the code
-
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
+       /*  // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();*/
     }
