@@ -96,6 +96,7 @@ public class LogActivity extends AppCompatActivity {
             String[] parts = data.split(":");
             String part1 = parts[0]; //contains the title
             String part2 = parts[1]; //your data
+           // (interpretTime(accident.getStart()).substring((interpretTime(accident.getStart()).indexOf(":")+1),(interpretTime(accident.getStart()).length));
         }
         return csv; // return the String in csv format
     }
