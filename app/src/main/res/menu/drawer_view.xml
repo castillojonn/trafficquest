@@ -9,5 +9,16 @@
         android:title="@string/saved_searches"
         app:showAsAction="always"
         android:checkable="false"/>
+    <item
+        android:id="@+id/action_Maps"
+        android:orderInCategory="101"
+        android:title="Maps"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_logout"
+        android:orderInCategory="103"
+        android:title="Logout"
+        app:showAsAction="never" />
+
 
 </menu>
