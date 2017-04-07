@@ -36,6 +36,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseReference;
@@ -298,6 +299,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 LatLng searchLatLng = new LatLng(thislat, thislng);
                                 mMap.addMarker(new MarkerOptions() // add markers from requested list
                                         .position(searchLatLng)
+                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
                                         .title("Type: " + interpretType2(accObj)) // title of the marker is the type of accident
                                         .snippet(accObj.getDescription() + "\n" // print description of the accident
                                                 + "at " + thislat + ", " + thislng + "\n" // print latitude and longitude
