@@ -183,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 drawerLayout.closeDrawer(Gravity.LEFT);
                 startActivity(new Intent(MainActivity.this, SavedSearchesActivity.class));
                 return false;
+
             }
         });
         navigationView.getMenu().findItem(R.id.action_Maps).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -349,13 +350,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 accObj = accidents.get(j); // get accident j
                                 // adds the description, start and end time, severity, and coordinates of accident to a list of strings
                                 // that will be displayed in the listview
-                                names.add("Coordinates: " + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
+                                names.add("1." + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
                                         + "," + accObj.getPoint().getCoordinates().get(1) + "\n"// add longitude to the list of Strings
-                                        + "" + interpretType2(accObj) + "\n"
-                                        + "" + accObj.getDescription()  + "\n" // add description to the list of Strings
-                                        + "" + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
-                                        + "" + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
-                                        + "" + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
+                                        + "2." + interpretType2(accObj) + "\n"
+                                        + "3." + accObj.getDescription()  + "\n" // add description to the list of Strings
+                                        + "4." + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
+                                        + "5." + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
+                                        + "6." + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
                                         );
 
                             }
