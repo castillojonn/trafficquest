@@ -185,6 +185,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return false;
             }
         });
+        navigationView.getMenu().findItem(R.id.action_Maps).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawerLayout.closeDrawer(Gravity.LEFT);
+                startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                return false;
+            }
+        });
+        navigationView.getMenu().findItem(R.id.action_logout).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawerLayout.closeDrawer(Gravity.LEFT);
+                FirebaseUser user = mAuth.getCurrentUser();
+                Toast.makeText(getApplicationContext(), user.getEmail().toString() + " has signed out", Toast.LENGTH_SHORT).show();
+                mAuth.signOut();
+                startActivity(new Intent(getApplicationContext(), DispatchActivity.class));
+                //return true;
+                return false;
+            }
+        });
     }
 
     private void initMap() {
