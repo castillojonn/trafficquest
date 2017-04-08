@@ -259,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (id == R.id.action_settings) { // if request data is pressed launch a new activity with the listview of traffic accidents
             if (isOnline()) {
                 isLogRequest = true; // used in the requestData method to check if it is a request to display the log
-                Toast.makeText(this, "Results:", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Results", Toast.LENGTH_LONG).show();
                 requestData(searchLatDouble, searchLngDouble); // requests data by the lattitude and longitude entered in the editText fields
                 names.clear(); // clear the string list so it won't keep adding to the existing list
                 accidents.clear(); // clear the accident list
