@@ -352,13 +352,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 accObj = accidents.get(j); // get accident j
                                 // adds the description, start and end time, severity, and coordinates of accident to a list of strings
                                 // that will be displayed in the listview
-                                names.add("1." + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
-                                        + "," + accObj.getPoint().getCoordinates().get(1) + "\n"// add longitude to the list of Strings
-                                        + "2." + interpretType2(accObj) + "\n"
-                                        + "3." + accObj.getDescription()  + "\n" // add description to the list of Strings
-                                        + "4." + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
-                                        + "5." + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
-                                        + "6." + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
+                                names.add("" + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
+                                        + "," + accObj.getPoint().getCoordinates().get(1)// add longitude to the list of Strings
+                                        + "," + interpretType2(accObj)
+                                        + "," + accObj.getDescription() // add description to the list of Strings
+                                        + "," + interpretTime(accObj.getStart()) // add start time to the list of Strings
+                                        + "," + interpretTime(accObj.getEnd())  // add end time to the list of Strings
+                                        + "," + interpretSeverity(accObj) // add severity to the list of Strings
                                         );
 
                             }
@@ -408,7 +408,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         String timeString = t.substring(6, t.length()-2); // gets rid of the leading and trailing slashes and parenthesis
         String date; // value to return
         long time = Long.parseLong(timeString); // parse the string as a long
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy 'at' HH:mm:ss z"); // sets the format
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm"); // sets the format
         date = sdf.format(new Date(time)); // sets the entered string as the SimpleDateFormat
 
         return date; // return the date
