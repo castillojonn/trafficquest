@@ -86,12 +86,7 @@ public class LogActivity extends AppCompatActivity {
                     interpretTime(accident.getStart()) + "," + // add the start time of accident to list
                     interpretTime(accident.getEnd()) + "," + // add the end time of accident to list
                     interpretType2(accident) + "\n"; // add the type of the accident to the list (accident, weather, hazard, etc.) and go to next line
-            String data=interpretTime(accident.getStart());
-            String[] parts = data.split(":");
-            String part1 = parts[0]; //contains the title
-            String part2 = parts[1]; //your data
-            String startTime = interpretTime(accident.getStart());
-            //String startTimeWithoutTitle= startTime.substring(startTime.indexOf(":")+1,startTime.length);
+
         }
         return csv; // return the String in csv format
     }

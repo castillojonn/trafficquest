@@ -351,11 +351,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 // that will be displayed in the listview
                                 names.add("Coordinates: " + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
                                         + "," + accObj.getPoint().getCoordinates().get(1) + "\n"// add longitude to the list of Strings
-                                        + "Type: " + interpretType2(accObj) + "\n"
-                                        + "Description: " + accObj.getDescription()  + "\n" // add description to the list of Strings
-                                        + "Start time: " + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
-                                        + "End time: " + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
-                                        + "Severity: " + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
+                                        + "" + interpretType2(accObj) + "\n"
+                                        + "" + accObj.getDescription()  + "\n" // add description to the list of Strings
+                                        + "" + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
+                                        + "" + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
+                                        + "" + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
                                         );
 
                             }
@@ -492,13 +492,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (getAccidents.size() != 0) { // adds the results to a list of strings to display in the log activity, much like the request data method
                     for (int i = 0; i < getAccidents.size(); i++) {
                         Accidents accObj = getAccidents.get(i);
-                        names.add("Coordinates: " + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
+                        names.add("" + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
                                 + "," + accObj.getPoint().getCoordinates().get(1) + "\n"// add longitude to the list of Strings
-                                + "Type: " + interpretType2(accObj) + "\n"
-                                + "Description: " + accObj.getDescription() + "\n" // add description to the list of Strings
-                                + "Start time: " + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
-                                + "End time: " + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
-                                + "Severity: " + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
+                                + "" + interpretType2(accObj) + "\n"
+                                + "" + accObj.getDescription() + "\n" // add description to the list of Strings
+                                + "" + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
+                                + "" + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
+                                + "" + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
                         );
                     }
 
