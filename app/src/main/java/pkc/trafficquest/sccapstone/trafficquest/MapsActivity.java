@@ -535,9 +535,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Snackbar.make(findViewById(R.id.coordinatorlayout), getString(R.string.search_saved).replace("{name}", name),
                 Snackbar.LENGTH_LONG).show();
     }
-//mDatabase = FirebaseDatabase.getInstance().getReferenceFromUrl(MainActivity.FIREBASE_URL).child("users").child("" + mAuth.getCurrentUser().getUid()).child("addresses").child("accidents");
     private void saveSearch(String name, Address address) {
-        mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).child("addresses").child("accidents").child(name).setValue(new pkc.trafficquest.sccapstone.trafficquest.Address(name, address));
+        mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).child("addresses").child(name).setValue((new pkc.trafficquest.sccapstone.trafficquest.Address(name, address)));
     }
 
     private void showMarker(Address address) {
