@@ -45,12 +45,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final int ERROR_DIALOG_REQUEST = 9001;
     private static final String TRAFFICQUEST = "trafficquest";
     private static final String ADDRESS = "address";
     private static final String PICK_LOCATION = "picklocation";
     public static final String LOCATION = "location";
+    public static final String ENDPOINT = "http://dev.virtualearth.net";
 
     GoogleMap mMap;
     private static final double
@@ -250,27 +257,81 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         mMap.setMyLocationEnabled(true);
         // loop through list, get coordinates, and place markers where accidents are
+        searchIncidents(COLUMBIA_LAT,COLUMBIA_LNG);
+    }
+
+    public void searchIncidents(double lat, double lng) {
+        Retrofit restAdapter = new Retrofit.Builder()
+                .baseUrl(ENDPOINT).addConverterFactory(GsonConverterFactory.create()).build();
+        AccidentsAPI api = restAdapter.create(AccidentsAPI.class);
+        double distanceLat = 160.934, distanceLng = 160.934;//100 miles
+        distanceLat /= 110.574; // converts the distance to degrees latitude
+        distanceLng /= 111.32*Math.cos(Math.toDegrees(lat)); // converts the distance to degrees longitude
+        // coordinates used to search a bounding box of 100mi around the entered latitude and longitude
+        double southLat = lat - distanceLat;
+        double westLng = lng - distanceLng;
+        double northLat = lat + distanceLat;
+        double eastLng = lng + distanceLng;
+        Call<RequestPackage> acc = api.getIncidents(southLat,westLng,northLat,eastLng);
+        acc.enqueue(new Callback<RequestPackage>() {
+            @Override
+            public void onResponse(Call<RequestPackage> call, Response<RequestPackage> response) {
+                RequestPackage res = response.body();
+                try {
+                    if (response !=  null) {
+                        ArrayList<ResourceSet> rSet = new ArrayList<ResourceSet>();
+                        for (int i = 0; i < res.getResourceSets().size(); i++) {
+                            rSet.add(res.getResourceSets().get(i));
+                        }
+                        for (int i = 0; i < rSet.size(); i++) {
+                            ResourceSet rSetobj = new ResourceSet();
+                            rSetobj = rSet.get(i);
+                            accidents = rSetobj.getResources();
+                            //ArrayList<String> names = new ArrayList<String>();
+                            for (int j = 0; j < accidents.size(); j++) { // loop through accidents to add them to a list of Strings
+                                Accidents accObj /*= new Accidents()*/;
+                                accObj = accidents.get(j); // get accident j
+                                // adds the description, start and end time, severity, and coordinates of accident to a list of strings
+                                // that will be displayed in the listview
+                                double thislat = accObj.getPoint().getCoordinates().get(0); // get latitude
+                                double thislng = accObj.getPoint().getCoordinates().get(1); // get longitude
+                                LatLng searchLatLng = new LatLng(thislat, thislng);
+                                mMap.addMarker(new MarkerOptions() // add markers from requested list
+                                        .position(searchLatLng)
+                                        .title("Type: " + interpretType2(accObj)) // title of the marker is the type of accident
+                                        .snippet(accObj.getDescription() + "\n" // print description of the accident
+                                                + "at " + thislat + ", " + thislng + "\n" // print latitude and longitude
+                                                + "Start Time: " + accObj.getStart() + "\n" // print the start time of the accident
+                                                + "End Time: " + accObj.getEnd() + "\n" // print the end time of the accident
+                                                + "Severity: " + accObj.getSeverity()) // print the severity of the accident
+                                );
+
+                            }
+                            //mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).setValue(names); // stores the requested list into the database
+                        }
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RequestPackage> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Message: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                    Log.d("Message", t.getMessage());
+                    t.printStackTrace();
+            }
+        });
+
         if (accidents != null) { // checks to see if the arraylist of accidents is null, if not, proceed
             for (int i = 0; i < accidents.size(); i++) { // loop through all accidents in the arraylist
                 Accidents accident = accidents.get(i); // individual accident
                 // initialize coordinates from the requested accident list
-                lat = accident.getPoint().getCoordinates().get(0); // get latitude
-                lng = accident.getPoint().getCoordinates().get(1); // get longitude
-                LatLng searchLatLng = new LatLng(lat, lng);
-                mMap.addMarker(new MarkerOptions() // add markers from requested list
-                        .position(searchLatLng)
-                        .title("Type: " + interpretType2(accident)) // title of the marker is the type of accident
-                        .snippet(accident.getDescription() + "\n" // print description of the accident
-                                + "at " + lat + ", " + lng + "\n" // print latitude and longitude
-                                + "Start Time: " + accident.getStart() + "\n" // print the start time of the accident
-                                + "End Time: " + accident.getEnd() + "\n" // print the end time of the accident
-                                + "Severity: " + accident.getSeverity()) // print the severity of the accident
-                );
+
 
             }
         }
     }
-
     /*
     interprets what each type code means
     @param acc The Accidents object to get the type code from
@@ -421,6 +482,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             showMarker(address);
             showSaveSearchSnackbar(address);
             setCurrentLocation(address);
+            searchIncidents(address.getLatitude(),address.getLongitude());
         } else {
             Toast.makeText(this, R.string.no_address_found, Toast.LENGTH_LONG).show();
         }

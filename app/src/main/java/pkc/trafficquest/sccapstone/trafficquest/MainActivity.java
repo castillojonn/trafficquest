@@ -184,6 +184,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 drawerLayout.closeDrawer(Gravity.LEFT);
                 startActivity(new Intent(MainActivity.this, SavedSearchesActivity.class));
                 return false;
+
+            }
+        });
+        navigationView.getMenu().findItem(R.id.action_Maps).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawerLayout.closeDrawer(Gravity.LEFT);
+                startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                return false;
+            }
+        });
+        navigationView.getMenu().findItem(R.id.action_logout).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawerLayout.closeDrawer(Gravity.LEFT);
+                FirebaseUser user = mAuth.getCurrentUser();
+                Toast.makeText(getApplicationContext(), user.getEmail().toString() + " has signed out", Toast.LENGTH_SHORT).show();
+                mAuth.signOut();
+                startActivity(new Intent(getApplicationContext(), DispatchActivity.class));
+                //return true;
+                return false;
             }
         });
     }
@@ -239,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (id == R.id.action_settings) { // if request data is pressed launch a new activity with the listview of traffic accidents
             if (isOnline()) {
                 isLogRequest = true; // used in the requestData method to check if it is a request to display the log
-                Toast.makeText(this, "Results:", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Results", Toast.LENGTH_LONG).show();
                 requestData(searchLatDouble, searchLngDouble); // requests data by the lattitude and longitude entered in the editText fields
                 names.clear(); // clear the string list so it won't keep adding to the existing list
                 accidents.clear(); // clear the accident list
@@ -329,13 +352,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 accObj = accidents.get(j); // get accident j
                                 // adds the description, start and end time, severity, and coordinates of accident to a list of strings
                                 // that will be displayed in the listview
-                                names.add("Coordinates: " + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
+                                names.add("1." + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
                                         + "," + accObj.getPoint().getCoordinates().get(1) + "\n"// add longitude to the list of Strings
-                                        + "Type: " + interpretType2(accObj) + "\n"
-                                        + "Description: " + accObj.getDescription()  + "\n" // add description to the list of Strings
-                                        + "Start time: " + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
-                                        + "End time: " + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
-                                        + "Severity: " + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
+                                        + "2." + interpretType2(accObj) + "\n"
+                                        + "3." + accObj.getDescription()  + "\n" // add description to the list of Strings
+                                        + "4." + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
+                                        + "5." + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
+                                        + "6." + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
                                         );
 
                             }
@@ -472,13 +495,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (getAccidents.size() != 0) { // adds the results to a list of strings to display in the log activity, much like the request data method
                     for (int i = 0; i < getAccidents.size(); i++) {
                         Accidents accObj = getAccidents.get(i);
-                        names.add("Coordinates: " + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
+                        names.add("" + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
                                 + "," + accObj.getPoint().getCoordinates().get(1) + "\n"// add longitude to the list of Strings
-                                + "Type: " + interpretType2(accObj) + "\n"
-                                + "Description: " + accObj.getDescription() + "\n" // add description to the list of Strings
-                                + "Start time: " + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
-                                + "End time: " + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
-                                + "Severity: " + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
+                                + "" + interpretType2(accObj) + "\n"
+                                + "" + accObj.getDescription() + "\n" // add description to the list of Strings
+                                + "" + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
+                                + "" + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
+                                + "" + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
                         );
                     }
 

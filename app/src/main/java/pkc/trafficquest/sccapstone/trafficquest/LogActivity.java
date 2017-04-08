@@ -2,13 +2,11 @@ package pkc.trafficquest.sccapstone.trafficquest;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -19,9 +17,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import com.google.firebase.auth.FirebaseAuth;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -35,6 +30,7 @@ public class LogActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_log);
         Intent logIntent = getIntent();
         Bundle data = logIntent.getExtras();
@@ -46,15 +42,10 @@ public class LogActivity extends AppCompatActivity {
             listView = (ListView) findViewById(R.id.aListview);
             listView.setAdapter(accAdapter);
             csvString = createCSV(accidents); // makes a csv out of the list of accidents
+
         }
 
-       /* Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        GoogleMap mgoogleMap;
-        //Hello welcome to the code
-
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
+       /*  // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();*/
     }
@@ -95,6 +86,7 @@ public class LogActivity extends AppCompatActivity {
                     interpretTime(accident.getStart()) + "," + // add the start time of accident to list
                     interpretTime(accident.getEnd()) + "," + // add the end time of accident to list
                     interpretType2(accident) + "\n"; // add the type of the accident to the list (accident, weather, hazard, etc.) and go to next line
+
         }
         return csv; // return the String in csv format
     }
@@ -146,7 +138,7 @@ public class LogActivity extends AppCompatActivity {
         String timeString = t.substring(6, t.length()-2); // gets rid of the leading and trailing slashes and parenthesis
         String date; // value to return
         long time = Long.parseLong(timeString); // parse the string as a long
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy 'at' HH:mm:ss z"); // sets the format
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy 'at' HH:mm z"); // sets the format
         date = sdf.format(new Date(time)); // sets the entered string as the SimpleDateFormat
 
         return date; // return the date
@@ -261,5 +253,7 @@ public class LogActivity extends AppCompatActivity {
 
     public void toastMaker(String toast) {
         Toast.makeText(getApplicationContext(), toast, Toast.LENGTH_SHORT).show();
+
+
     }
 }
