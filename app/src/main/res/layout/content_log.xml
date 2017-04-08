@@ -12,7 +12,6 @@
         android:text="Here"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="24dp"
         android:layout_marginRight="24dp"/>
 
     <EditText

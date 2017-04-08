@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -60,7 +61,7 @@ public class SignUpActivity extends AppCompatActivity {
         String email = emailAddress.getText().toString();
         String pass = password.getText().toString();
         String repass = retypePass.getText().toString();
-        if (pass.equals(repass)){
+        if (!(email.equals("")) && Patterns.EMAIL_ADDRESS.matcher(email).matches() && !(pass.equals("")) && !(repass.equals("")) && pass.equals(repass)){
             mAuth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -72,11 +73,15 @@ public class SignUpActivity extends AppCompatActivity {
                     }
                 }
             });
-
+        }
+        else if (!(pass.equals(repass))) {
+            Toast.makeText(getApplicationContext(),"Passwords do not match",Toast.LENGTH_SHORT).show();
+        }
+        else if (email.equals("") || !(Patterns.EMAIL_ADDRESS.matcher(email).matches())){
+            Toast.makeText(getApplicationContext(),"Enter a valid email address",Toast.LENGTH_SHORT).show();
         }
         else {
-
-            Toast.makeText(getApplicationContext(),"Passwords do not match",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"Enter a password",Toast.LENGTH_SHORT).show();
         }
     }
 
