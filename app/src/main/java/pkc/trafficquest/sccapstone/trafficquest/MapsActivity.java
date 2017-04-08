@@ -38,6 +38,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -68,6 +69,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<String> names; // String version of accident list
     private double lat; // latitude
     private double lng; // longitude
+    private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
     private pkc.trafficquest.sccapstone.trafficquest.Address mAddress;
     private boolean mPickLocation = false;
@@ -112,6 +114,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         hideKeyboard();
 
         mDatabase = FirebaseDatabase.getInstance().getReferenceFromUrl(MainActivity.FIREBASE_URL); // reference to the Firebase path
+        mAuth = FirebaseAuth.getInstance();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.Maps);
         mapFragment.getMapAsync(this);
@@ -532,9 +535,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Snackbar.make(findViewById(R.id.coordinatorlayout), getString(R.string.search_saved).replace("{name}", name),
                 Snackbar.LENGTH_LONG).show();
     }
-
+//mDatabase = FirebaseDatabase.getInstance().getReferenceFromUrl(MainActivity.FIREBASE_URL).child("users").child("" + mAuth.getCurrentUser().getUid()).child("addresses").child("accidents");
     private void saveSearch(String name, Address address) {
-        mDatabase.child("addresses").child(name).setValue(new pkc.trafficquest.sccapstone.trafficquest.Address(name, address));
+        mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).child("addresses").child("accidents").child(name).setValue(new pkc.trafficquest.sccapstone.trafficquest.Address(name, address));
     }
 
     private void showMarker(Address address) {
