@@ -322,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         double distanceLat = 160.934,
                distanceLng = 160.934; // in km = 100 mi
         distanceLat /= 110.574; // converts the distance to degrees latitude
-        distanceLng /= 111.32*Math.cos(Math.toDegrees(lat)); // converts the distance to degrees longitude
+        distanceLng /= 111.32*Math.cos(Math.toRadians(lat)); // converts the distance to degrees longitude
         // coordinates used to search a bounding box of 100mi around the entered latitude and longitude
         double southLat = lat - distanceLat;
         double westLng = lng - distanceLng;

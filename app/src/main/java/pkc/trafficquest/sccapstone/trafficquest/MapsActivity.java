@@ -266,7 +266,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         AccidentsAPI api = restAdapter.create(AccidentsAPI.class);
         double distanceLat = 160.934, distanceLng = 160.934;//100 miles
         distanceLat /= 110.574; // converts the distance to degrees latitude
-        distanceLng /= 111.32*Math.cos(Math.toDegrees(lat)); // converts the distance to degrees longitude
+        distanceLng /= 111.32*Math.cos(Math.toRadians(lat)); // converts the distance to degrees longitude
         // coordinates used to search a bounding box of 100mi around the entered latitude and longitude
         double southLat = lat - distanceLat;
         double westLng = lng - distanceLng;
