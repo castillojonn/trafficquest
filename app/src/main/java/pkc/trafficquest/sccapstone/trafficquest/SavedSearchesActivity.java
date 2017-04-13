@@ -36,7 +36,7 @@ public class SavedSearchesActivity extends AppCompatActivity {
 
 
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReferenceFromUrl(MainActivity.FIREBASE_URL).child("users").child("" + mAuth.getCurrentUser().getUid()).child("addresses").child("accidents");
+        mDatabase = FirebaseDatabase.getInstance().getReferenceFromUrl(MainActivity.FIREBASE_URL).child("users").child("" + mAuth.getCurrentUser().getUid()).child("addresses");
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
