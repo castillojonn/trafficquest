@@ -260,7 +260,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         mMap.setMyLocationEnabled(true);
         // loop through list, get coordinates, and place markers where accidents are
-        searchIncidents(COLUMBIA_LAT,COLUMBIA_LNG);
+        //searchIncidents(COLUMBIA_LAT,COLUMBIA_LNG);
     }
 
     public void searchIncidents(double lat, double lng) {

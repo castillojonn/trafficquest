@@ -1,5 +1,7 @@
 package pkc.trafficquest.sccapstone.trafficquest;
 
+import android.*;
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -10,13 +12,16 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.ActionMenuItem;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
@@ -65,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final String FIREBASE_URL = "https://trafficquest-9b525.firebaseio.com/";
     public static final int REQUEST_CODE_LOG = 1;
     private static final int SELECT_LOCATION_REQUEST_CODE = 100;
+    private static final int PERMISSION_LOCATION = 2;
     private FirebaseAuth mAuth;
     private ArrayList<Accidents> accidents = new ArrayList<>(); // arraylist of accidents
     private ArrayList<Accidents> getAccidents = new ArrayList<>();
@@ -141,28 +147,63 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
-                Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(client);
 
-                Log.e("Main", "Last Location" + lastLocation);
+                if (checkLocationPermission()){ // asks the user for permission to access location if not already enabled
+                    Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(client);
 
-                searchLat.setText(Double.toString(lastLocation.getLatitude()));
-                searchLng.setText(Double.toString(lastLocation.getLongitude()));
+                    Log.e("Main", "Last Location" + lastLocation);
 
-                if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                        && ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-
-                    Toast.makeText(MainActivity.this, "Permission not Granted", Toast.LENGTH_LONG).show();
-                    return;
+                    searchLat.setText(Double.toString(lastLocation.getLatitude())); // sets the current latitude and longitude of the user
+                    searchLng.setText(Double.toString(lastLocation.getLongitude()));
                 }
+
+
             }
         });
+    }
+
+    /*
+    Checks if app has access to the user's location, if not requests to enable the permission
+     */
+    public boolean checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) { // checks if permission is granted for fine and coarse location
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_LOCATION); // request permission if not granted
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    /*
+    Handle the permissions request response
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, get the latitude and longitude
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(client);
+
+                        Log.e("Main", "Last Location" + lastLocation);
+
+                        searchLat.setText(Double.toString(lastLocation.getLatitude()));
+                        searchLng.setText(Double.toString(lastLocation.getLongitude()));
+                    }
+
+                } else {
+                    Toast.makeText(MainActivity.this, "Permission not Granted", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+        }
     }
 
     @SuppressWarnings("ConstantConditions")

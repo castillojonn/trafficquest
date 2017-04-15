@@ -1,16 +1,25 @@
 package pkc.trafficquest.sccapstone.trafficquest;
 
+import android.*;
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.google.android.gms.location.LocationServices;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,10 +30,14 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class LogActivity extends AppCompatActivity {
+    private static final int PERMISSION_WRITE_STORAGE_SAVE = 3; // code for when user selects download csv
+    private static final int PERMISSION_WRITE_STORAGE_EMAIL = 4; // code for when user selects email csv
     private ArrayList<String> accidentList; // used for the String version of the accident list
     private ArrayList<Accidents> accidents; // used for the list of type Accidents
-    private ListView listView;
-    private String csvString;
+    private ListView listView; // view to display results of accidents
+    private String csvString; // String used create the csv
+    private boolean isDownload = false; // checks if download csv is selected
+    private boolean isEmail = false; // checks if email csv is selected
     public static final int REQUEST_CODE_MAIN = 1;
 
     @Override
@@ -61,13 +74,77 @@ public class LogActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) { // menu to select between downloading or emailing a csv of requested accidents
         int id = item.getItemId();
         if (id == R.id.action_download){ // downloads csv of requested accidents if selected
-            saveCSV(csvString);
+            isDownload = true;
+            if (checkWriteStoragePermission()) { // check storage permission and download csv if permission granted
+                saveCSV(csvString);
+            }
+            isDownload = false;
         }
         else if (id == R.id.action_email){ // downloads and emails csv of requested accidents if selected
-            sendEmail(csvString);
+            isEmail = true;
+            if (checkWriteStoragePermission()){ // check write external storage permission and send email if permission granted
+                sendEmail(csvString);
+            }
+            isEmail = false;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    /*
+    Checks if app has access to the user's external storage, if not requests to enable the permission
+     */
+    public boolean checkWriteStoragePermission() {
+        if (isDownload && ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) { // checks if permission is granted for writing to external storage
+            ActivityCompat.requestPermissions(LogActivity.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_WRITE_STORAGE_SAVE); // request permission if not granted, handles PERMISSION_WRITE_STORAGE_SAVE case in onRequestPermissionResult
+            isDownload = false;
+            return false;
+        }
+        else if (isEmail && ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){ // checks if permission is granted for writing to external storage
+            ActivityCompat.requestPermissions(LogActivity.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_WRITE_STORAGE_EMAIL); // request permission if not granted, handles PERMISSION_WRITE_STORAGE_EMAIL case in onRequestPermissionResult
+            isEmail = false;
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_WRITE_STORAGE_SAVE: { // handles case for when user selects download csv
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, get the latitude and longitude
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) { // if permission granted, save csv
+                        saveCSV(csvString);
+                    }
+
+                } else {
+                    Toast.makeText(LogActivity.this, "Permission not Granted", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+            case PERMISSION_WRITE_STORAGE_EMAIL: { // handles case for when user selects email csv
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, get the latitude and longitude
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) { // if permission granted, email csv
+                        sendEmail(csvString);
+                    }
+
+                } else {
+                    Toast.makeText(LogActivity.this, "Permission not Granted", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+            }
+
+        }
 
     /*
         Creates a csv file for the list of requested accidents
