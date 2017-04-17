@@ -7,13 +7,16 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -22,7 +25,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.ActionMenuItem;
+import android.support.v7.view.menu.ExpandedMenuView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -38,7 +43,15 @@ import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -69,12 +82,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final String ENDPOINT = "http://dev.virtualearth.net";
     public static final String FIREBASE_URL = "https://trafficquest-9b525.firebaseio.com/";
     public static final int REQUEST_CODE_LOG = 1;
+    private static final int PERMISSION_LOCATION = 2; // used when requesting permission to access the user's location
+    public static final int SETTINGS_REQUEST_LOCATION = 3; // used when requesting to turn on location services on the user's device
     private static final int SELECT_LOCATION_REQUEST_CODE = 100;
-    private static final int PERMISSION_LOCATION = 2;
     private FirebaseAuth mAuth;
     private ArrayList<Accidents> accidents = new ArrayList<>(); // arraylist of accidents
     private ArrayList<Accidents> getAccidents = new ArrayList<>();
     private List<String> names = new ArrayList<String>(); // a list of strings used in the listview in LogActivity
+    private boolean isLogRequest = false; // used to launch the log activity if true
+    private boolean isMapRequest = false; // used to launch the log activity if true
     Intent logIntent; // intent to launch LogActivity
     Intent mapIntent; // intent to launch MapsActivity
     private DatabaseReference mDatabase; // reference to the Firebase
@@ -86,8 +102,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // double version of searchLat and searchLng
     double searchLatDouble;
     double searchLngDouble;
-    private boolean isLogRequest = false; // used to launch the log activity if true
-    private boolean isMapRequest = false; // used to launch the log activity if true
+
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -100,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
+    private LocationRequest mLocationRequest; // location request used when checking if device's location services are enabled
 
 
     @Override
@@ -126,8 +142,59 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .addApi(LocationServices.API)
                 .build();
 
+        createLocationRequest();
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(mLocationRequest); // add location request to builder
+
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(client,builder.build()); // are location settings satisfied?
+
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() { // handle result callback
+            @Override
+            public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
+                final Status status = locationSettingsResult.getStatus();
+                //final LocationSettingsStates = locationSettingsResult.getLocationSettingsStates();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        // Location Services enabled...
+                        // do nothing
+
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location Services not enabled...
+                        // Ask to turn on in order to use "here" button
+
+                        try {
+                            // Show the dialog
+                            // check the result in onActivityResult().
+                            status.startResolutionForResult(
+                                    MainActivity.this,
+                                    SETTINGS_REQUEST_LOCATION); // if the device's location services are disabled, dialog pops up asking to enable them for better results
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way
+                        // to fix the sttings so we son't show the dialog.
+
+                        break;
+                }
+
+            }
+        });
+
         connectHereButton();
         connectPickFromMap();
+    }
+
+    /*
+    Creates a request for the user's location
+     */
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000); // interval of 10 seconds
+        mLocationRequest.setFastestInterval(5000); // fastest interval of 5 seconds
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     private void connectPickFromMap() {
@@ -143,23 +210,57 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void connectHereButton() {
         Log.e("Main", "Connect Here button");
 
+
         findViewById(R.id.here_button).setOnClickListener(new View.OnClickListener() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
+                Location lastLocation = null; // used to get the device's last known location
+                boolean locEnabled = false; // used to check if the device's location services are turned on
+                locEnabled = isLocationEnabled(getApplicationContext()); // checks if location services are enabled
 
-                if (checkLocationPermission()){ // asks the user for permission to access location if not already enabled
-                    Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(client);
+                if (locEnabled && checkLocationPermission()){ // asks the user for permission to access location if not already enabled
+                    lastLocation = LocationServices.FusedLocationApi.getLastLocation(client); // get the device's last known location
 
                     Log.e("Main", "Last Location" + lastLocation);
 
-                    searchLat.setText(Double.toString(lastLocation.getLatitude())); // sets the current latitude and longitude of the user
-                    searchLng.setText(Double.toString(lastLocation.getLongitude()));
+                    if (lastLocation != null){ // makes sure lastLocation is not null before filling text boxes with coordinates
+                        searchLat.setText(Double.toString(lastLocation.getLatitude())); // sets the current latitude and longitude of the user
+                        searchLng.setText(Double.toString(lastLocation.getLongitude()));
+                    }
+
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "Location Services is not enabled.", Toast.LENGTH_SHORT).show();
                 }
 
 
             }
         });
+    }
+
+    /*
+    Checks device's settings to check if location services is enabled.
+    @return returns true if location services are enabled, false if otherwise
+     */
+    public static boolean isLocationEnabled(Context context) {
+        int locationMode = 0;
+        String locationProviders;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) { // if sdk version is higher or equal to KITKAT
+            try {
+                locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE); // sets locationMode to LOCATION_MODE
+            } catch (Settings.SettingNotFoundException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            return locationMode != Settings.Secure.LOCATION_MODE_OFF; // returns true if location mode is not off, false if turned on
+        }
+        else { // if sdk version is below KITKAT, set locationProviders to LOCATION_PROVIDERS_ALLOWED
+            locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+            return !TextUtils.isEmpty(locationProviders); // if it is not empty return true, false otherwise
+        }
     }
 
     /*
@@ -376,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 RequestPackage res = response.body();
                 try {
                     if (response != null) {
-                        Toast.makeText(getApplicationContext(), "Message: " + response.message() + ": " + response.code(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), "Message: " + response.message() + ": " + response.code(), Toast.LENGTH_LONG).show();
                         //ArrayList<Accidents> accidents = new ArrayList<Accidents>();
                         ArrayList<ResourceSet> rSet = new ArrayList<ResourceSet>();
                         for (int i = 0; i < res.getResourceSets().size(); i++) {
@@ -405,7 +506,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             }
                             //mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).setValue(names); // stores the requested list into the database
                             mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).child("Accidents").setValue(accidents); // stores the requested list into the database
-                            toastMaker("Task Completed");
+                            //toastMaker("Task Completed");
 
                         }
                         logIntent.putStringArrayListExtra("accidentList", (ArrayList<String>) names); // places the names array so it can be displayed in a listview in LogActivity

@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity  {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
-                        Toast.makeText(getApplicationContext(), "User sign in succesfull", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "User sign in successful", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     } else {
                         Toast.makeText(getApplicationContext(), "Incorrect password and email combination", Toast.LENGTH_SHORT).show();
