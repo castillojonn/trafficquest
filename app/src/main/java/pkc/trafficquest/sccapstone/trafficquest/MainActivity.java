@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.ActionMenuItem;
@@ -431,6 +432,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         else if (id == R.id.action_getFromFirebase) { // if get from Firebase is requested, get and display the last queried results
             getDataFromFirebase();
+        }
+        else if (id == android.R.id.home) { // if "hamburger button is selected, open or close the drawer
+            DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+            if (mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+                mDrawerLayout.closeDrawer(GravityCompat.START); // close drawer if drawer is already open
+            }
+            else {
+                mDrawerLayout.openDrawer(GravityCompat.START); // otherwise, open the drawer
+            }
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
