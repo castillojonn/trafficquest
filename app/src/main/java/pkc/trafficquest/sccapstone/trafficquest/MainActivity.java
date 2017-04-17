@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         GoogleMap mgoogleMap;
         // Text boxes to enter the latitude and longitude to search
-        searchLat = (EditText) findViewById(R.id.editLattitude);
+        searchLat = (EditText) findViewById(R.id.editLatitude);
         searchLng = (EditText) findViewById(R.id.editLongitude);
 
         //view = (ListView) findViewById(R.id.aListview);
