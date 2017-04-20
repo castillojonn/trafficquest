@@ -40,6 +40,7 @@ public class SignUpActivity extends AppCompatActivity {
         emailAddress = (EditText) findViewById(R.id.email_in);
         password = (EditText)findViewById(R.id.password_in);
         mSignUpButton = (Button) findViewById(R.id.email_signup_button_in);
+        Button mBackButton = (Button) findViewById(R.id.backToStart);
         retypePass = (EditText) findViewById(R.id.retypepasswrd_in);
         mAuth = FirebaseAuth.getInstance();
         mSignUpButton.setOnClickListener(new View.OnClickListener() {
@@ -48,7 +49,12 @@ public class SignUpActivity extends AppCompatActivity {
                 signIn();
             }
         });
-
+        mBackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
     }
 

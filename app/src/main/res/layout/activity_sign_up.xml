@@ -39,11 +39,11 @@
                 android:hint="@string/prompt_email"
 
                 android:inputType="textEmailAddress"
-                android:maxLines="1"
                 android:maxLength="30"
+                android:maxLines="1"
                 android:singleLine="true"
-                android:textSize="20dp"
-                android:textIsSelectable="true" />
+                android:textIsSelectable="true"
+                android:textSize="20dp" />
 
             <EditText
                 android:id="@+id/password_in"
@@ -52,11 +52,12 @@
                 android:hint="Password"
 
                 android:inputType="textPassword"
-                android:maxLines="1"
                 android:maxLength="10"
+                android:maxLines="1"
                 android:singleLine="true"
-                android:textSize="20dp"
-                android:textIsSelectable="false" />
+                android:textIsSelectable="false"
+                android:textSize="20dp" />
+
             <EditText
                 android:id="@+id/retypepasswrd_in"
                 android:layout_width="match_parent"
@@ -64,11 +65,11 @@
                 android:hint="Retype Password"
 
                 android:inputType="textPassword"
-                android:maxLines="1"
                 android:maxLength="10"
+                android:maxLines="1"
                 android:singleLine="true"
-                android:textSize="20dp"
-                android:textIsSelectable="false" />
+                android:textIsSelectable="false"
+                android:textSize="20dp" />
 
 
             <Button
@@ -77,6 +78,14 @@
                 android:layout_width="130dp"
                 android:layout_height="wrap_content"
                 android:text="sign up"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/backToStart"
+                style="?android:textAppearanceSmall"
+                android:layout_width="65dp"
+                android:layout_height="wrap_content"
+                android:text="Back"
                 android:textStyle="bold" />
 
         </LinearLayout>

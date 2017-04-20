@@ -46,6 +46,13 @@ public class LoginActivity extends AppCompatActivity  {
                 signIn();
             }
         });
+        Button mBackButton = (Button) findViewById(R.id.backToStart);
+        mBackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
 
     }
