@@ -39,6 +39,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -69,6 +70,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<String> names; // String version of accident list
     private double lat; // latitude
     private double lng; // longitude
+    private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
     private pkc.trafficquest.sccapstone.trafficquest.Address mAddress;
     private boolean mPickLocation = false;
@@ -113,6 +115,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         hideKeyboard();
 
         mDatabase = FirebaseDatabase.getInstance().getReferenceFromUrl(MainActivity.FIREBASE_URL); // reference to the Firebase path
+        mAuth = FirebaseAuth.getInstance();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.Maps);
         mapFragment.getMapAsync(this);
@@ -258,7 +261,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         mMap.setMyLocationEnabled(true);
         // loop through list, get coordinates, and place markers where accidents are
-        searchIncidents(COLUMBIA_LAT,COLUMBIA_LNG);
+        //searchIncidents(COLUMBIA_LAT,COLUMBIA_LNG);
     }
 
     public void searchIncidents(double lat, double lng) {
@@ -267,7 +270,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         AccidentsAPI api = restAdapter.create(AccidentsAPI.class);
         double distanceLat = 160.934, distanceLng = 160.934;//100 miles
         distanceLat /= 110.574; // converts the distance to degrees latitude
-        distanceLng /= 111.32*Math.cos(Math.toDegrees(lat)); // converts the distance to degrees longitude
+        distanceLng /= 111.32*Math.cos(Math.toRadians(lat)); // converts the distance to degrees longitude
         // coordinates used to search a bounding box of 100mi around the entered latitude and longitude
         double southLat = lat - distanceLat;
         double westLng = lng - distanceLng;
@@ -534,9 +537,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Snackbar.make(findViewById(R.id.coordinatorlayout), getString(R.string.search_saved).replace("{name}", name),
                 Snackbar.LENGTH_LONG).show();
     }
-
     private void saveSearch(String name, Address address) {
-        mDatabase.child("addresses").child(name).setValue(new pkc.trafficquest.sccapstone.trafficquest.Address(name, address));
+        mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).child("addresses").child(name).setValue((new pkc.trafficquest.sccapstone.trafficquest.Address(name, address)));
     }
 
     private void showMarker(Address address) {

@@ -39,7 +39,8 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_map"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".SignUpActivity"
             android:label="@string/title_activity_sign_up"

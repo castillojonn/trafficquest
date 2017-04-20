@@ -10,7 +10,7 @@
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">a
+        android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -21,24 +21,24 @@
 
     </android.support.design.widget.AppBarLayout>
 
-
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
 
-        <include layout="@layout/content_log" />
+
+
+        <include layout="@layout/content_main" />
 
         <android.support.design.widget.NavigationView
             android:id="@+id/nav_view"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:paddingTop="28dp"
             app:menu="@menu/drawer_view" />
 
     </android.support.v4.widget.DrawerLayout>
-
 
     <!-- <include layout="@layout/content_main" /> -->
 

@@ -1,26 +1,38 @@
 package pkc.trafficquest.sccapstone.trafficquest;
 
+import android.*;
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.ActionMenuItem;
+import android.support.v7.view.menu.ExpandedMenuView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -32,7 +44,15 @@ import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -63,11 +83,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final String ENDPOINT = "http://dev.virtualearth.net";
     public static final String FIREBASE_URL = "https://trafficquest-9b525.firebaseio.com/";
     public static final int REQUEST_CODE_LOG = 1;
+    private static final int PERMISSION_LOCATION = 2; // used when requesting permission to access the user's location
+    public static final int SETTINGS_REQUEST_LOCATION = 3; // used when requesting to turn on location services on the user's device
     private static final int SELECT_LOCATION_REQUEST_CODE = 100;
     private FirebaseAuth mAuth;
     private ArrayList<Accidents> accidents = new ArrayList<>(); // arraylist of accidents
     private ArrayList<Accidents> getAccidents = new ArrayList<>();
     private List<String> names = new ArrayList<String>(); // a list of strings used in the listview in LogActivity
+    private boolean isLogRequest = false; // used to launch the log activity if true
+    private boolean isMapRequest = false; // used to launch the log activity if true
     Intent logIntent; // intent to launch LogActivity
     Intent mapIntent; // intent to launch MapsActivity
     private DatabaseReference mDatabase; // reference to the Firebase
@@ -79,8 +103,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // double version of searchLat and searchLng
     double searchLatDouble;
     double searchLngDouble;
-    private boolean isLogRequest = false; // used to launch the log activity if true
-    private boolean isMapRequest = false; // used to launch the log activity if true
+
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -93,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
+    private LocationRequest mLocationRequest; // location request used when checking if device's location services are enabled
 
 
     @Override
@@ -107,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         GoogleMap mgoogleMap;
         // Text boxes to enter the latitude and longitude to search
-        searchLat = (EditText) findViewById(R.id.editLattitude);
+        searchLat = (EditText) findViewById(R.id.editLatitude);
         searchLng = (EditText) findViewById(R.id.editLongitude);
 
         //view = (ListView) findViewById(R.id.aListview);
@@ -119,8 +143,59 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .addApi(LocationServices.API)
                 .build();
 
+        createLocationRequest();
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(mLocationRequest); // add location request to builder
+
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(client,builder.build()); // are location settings satisfied?
+
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() { // handle result callback
+            @Override
+            public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
+                final Status status = locationSettingsResult.getStatus();
+                //final LocationSettingsStates = locationSettingsResult.getLocationSettingsStates();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        // Location Services enabled...
+                        // do nothing
+
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location Services not enabled...
+                        // Ask to turn on in order to use "here" button
+
+                        try {
+                            // Show the dialog
+                            // check the result in onActivityResult().
+                            status.startResolutionForResult(
+                                    MainActivity.this,
+                                    SETTINGS_REQUEST_LOCATION); // if the device's location services are disabled, dialog pops up asking to enable them for better results
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way
+                        // to fix the sttings so we son't show the dialog.
+
+                        break;
+                }
+
+            }
+        });
+
         connectHereButton();
         connectPickFromMap();
+    }
+
+    /*
+    Creates a request for the user's location
+     */
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000); // interval of 10 seconds
+        mLocationRequest.setFastestInterval(5000); // fastest interval of 5 seconds
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     private void connectPickFromMap() {
@@ -136,32 +211,101 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void connectHereButton() {
         Log.e("Main", "Connect Here button");
 
+
         findViewById(R.id.here_button).setOnClickListener(new View.OnClickListener() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
-                Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(client);
+                Location lastLocation = null; // used to get the device's last known location
+                boolean locEnabled = false; // used to check if the device's location services are turned on
+                locEnabled = isLocationEnabled(getApplicationContext()); // checks if location services are enabled
 
-                Log.e("Main", "Last Location" + lastLocation);
+                if (locEnabled && checkLocationPermission()){ // asks the user for permission to access location if not already enabled
+                    lastLocation = LocationServices.FusedLocationApi.getLastLocation(client); // get the device's last known location
 
-                searchLat.setText(Double.toString(lastLocation.getLatitude()));
-                searchLng.setText(Double.toString(lastLocation.getLongitude()));
+                    Log.e("Main", "Last Location" + lastLocation);
 
-                if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                        && ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
+                    if (lastLocation != null){ // makes sure lastLocation is not null before filling text boxes with coordinates
+                        searchLat.setText(Double.toString(lastLocation.getLatitude())); // sets the current latitude and longitude of the user
+                        searchLng.setText(Double.toString(lastLocation.getLongitude()));
+                    }
 
-                    Toast.makeText(MainActivity.this, "Permission not Granted", Toast.LENGTH_LONG).show();
-                    return;
                 }
+                else {
+                    Toast.makeText(getApplicationContext(), "Location Services is not enabled.", Toast.LENGTH_SHORT).show();
+                }
+
+
             }
         });
+    }
+
+    /*
+    Checks device's settings to check if location services is enabled.
+    @return returns true if location services are enabled, false if otherwise
+     */
+    public static boolean isLocationEnabled(Context context) {
+        int locationMode = 0;
+        String locationProviders;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) { // if sdk version is higher or equal to KITKAT
+            try {
+                locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE); // sets locationMode to LOCATION_MODE
+            } catch (Settings.SettingNotFoundException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            return locationMode != Settings.Secure.LOCATION_MODE_OFF; // returns true if location mode is not off, false if turned on
+        }
+        else { // if sdk version is below KITKAT, set locationProviders to LOCATION_PROVIDERS_ALLOWED
+            locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+            return !TextUtils.isEmpty(locationProviders); // if it is not empty return true, false otherwise
+        }
+    }
+
+    /*
+    Checks if app has access to the user's location, if not requests to enable the permission
+     */
+    public boolean checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) { // checks if permission is granted for fine and coarse location
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_LOCATION); // request permission if not granted
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    /*
+    Handle the permissions request response
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, get the latitude and longitude
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(client);
+
+                        Log.e("Main", "Last Location" + lastLocation);
+
+                        searchLat.setText(Double.toString(lastLocation.getLatitude()));
+                        searchLng.setText(Double.toString(lastLocation.getLongitude()));
+                    }
+
+                } else {
+                    Toast.makeText(MainActivity.this, "Permission not Granted", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+        }
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -241,7 +385,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -288,6 +433,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         else if (id == R.id.action_getFromFirebase) { // if get from Firebase is requested, get and display the last queried results
             getDataFromFirebase();
         }
+        else if (id == android.R.id.home) { // if "hamburger button is selected, open or close the drawer
+            DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+            if (mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+                mDrawerLayout.closeDrawer(GravityCompat.START); // close drawer if drawer is already open
+            }
+            else {
+                mDrawerLayout.openDrawer(GravityCompat.START); // otherwise, open the drawer
+            }
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -320,7 +475,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         double distanceLat = 160.934,
                distanceLng = 160.934; // in km = 100 mi
         distanceLat /= 110.574; // converts the distance to degrees latitude
-        distanceLng /= 111.32*Math.cos(Math.toDegrees(lat)); // converts the distance to degrees longitude
+        distanceLng /= 111.32*Math.cos(Math.toRadians(lat)); // converts the distance to degrees longitude
         // coordinates used to search a bounding box of 100mi around the entered latitude and longitude
         double southLat = lat - distanceLat;
         double westLng = lng - distanceLng;
@@ -333,7 +488,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 RequestPackage res = response.body();
                 try {
                     if (response != null) {
-                        Toast.makeText(getApplicationContext(), "Message: " + response.message() + ": " + response.code(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), "Message: " + response.message() + ": " + response.code(), Toast.LENGTH_LONG).show();
                         //ArrayList<Accidents> accidents = new ArrayList<Accidents>();
                         ArrayList<ResourceSet> rSet = new ArrayList<ResourceSet>();
                         for (int i = 0; i < res.getResourceSets().size(); i++) {
@@ -350,19 +505,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 accObj = accidents.get(j); // get accident j
                                 // adds the description, start and end time, severity, and coordinates of accident to a list of strings
                                 // that will be displayed in the listview
-                                names.add("1." + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
-                                        + "," + accObj.getPoint().getCoordinates().get(1) + "\n"// add longitude to the list of Strings
-                                        + "2." + interpretType2(accObj) + "\n"
-                                        + "3." + accObj.getDescription()  + "\n" // add description to the list of Strings
-                                        + "4." + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
-                                        + "5." + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
-                                        + "6." + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
+                                names.add("" + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
+                                        + "," + accObj.getPoint().getCoordinates().get(1)// add longitude to the list of Strings
+                                        + "," + interpretType2(accObj)
+                                        + "," + accObj.getDescription() // add description to the list of Strings
+                                        + "," + interpretTime(accObj.getStart()) // add start time to the list of Strings
+                                        + "," + interpretTime(accObj.getEnd())  // add end time to the list of Strings
+                                        + "," + interpretSeverity(accObj) // add severity to the list of Strings
                                         );
 
                             }
                             //mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).setValue(names); // stores the requested list into the database
                             mDatabase.child("users").child("" + mAuth.getCurrentUser().getUid()).child("Accidents").setValue(accidents); // stores the requested list into the database
-                            toastMaker("Task Completed");
+                            //toastMaker("Task Completed");
 
                         }
                         logIntent.putStringArrayListExtra("accidentList", (ArrayList<String>) names); // places the names array so it can be displayed in a listview in LogActivity
@@ -406,7 +561,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         String timeString = t.substring(6, t.length()-2); // gets rid of the leading and trailing slashes and parenthesis
         String date; // value to return
         long time = Long.parseLong(timeString); // parse the string as a long
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy 'at' HH:mm:ss z"); // sets the format
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm"); // sets the format
         date = sdf.format(new Date(time)); // sets the entered string as the SimpleDateFormat
 
         return date; // return the date
@@ -494,12 +649,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     for (int i = 0; i < getAccidents.size(); i++) {
                         Accidents accObj = getAccidents.get(i);
                         names.add("" + accObj.getPoint().getCoordinates().get(0) // add latitude to the list of Strings
-                                + "," + accObj.getPoint().getCoordinates().get(1) + "\n"// add longitude to the list of Strings
-                                + "" + interpretType2(accObj) + "\n"
-                                + "" + accObj.getDescription() + "\n" // add description to the list of Strings
-                                + "" + interpretTime(accObj.getStart()) + "\n" // add start time to the list of Strings
-                                + "" + interpretTime(accObj.getEnd()) + "\n"  // add end time to the list of Strings
-                                + "" + interpretSeverity(accObj) + "\n" // add severity to the list of Strings
+                                + "," + accObj.getPoint().getCoordinates().get(1)// add longitude to the list of Strings
+                                + "," + interpretType2(accObj)
+                                + "," + accObj.getDescription() // add description to the list of Strings
+                                + "," + interpretTime(accObj.getStart()) // add start time to the list of Strings
+                                + "," + interpretTime(accObj.getEnd()) // add end time to the list of Strings
+                                + "," + interpretSeverity(accObj) // add severity to the list of Strings
                         );
                     }
 
