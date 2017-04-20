@@ -29,7 +29,7 @@ public class LoginActivity extends AppCompatActivity  {
     private EditText mPassword;
     private Button mLogin;
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener; //detects changes in the authentication state
+    //private FirebaseAuth.AuthStateListener mAuthListener; //detects changes in the authentication state
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

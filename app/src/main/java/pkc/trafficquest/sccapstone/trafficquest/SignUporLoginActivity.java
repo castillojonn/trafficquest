@@ -11,7 +11,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class SignUporLoginActivity extends AppCompatActivity implements View.OnClickListener {
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
+    //private FirebaseAuth.AuthStateListener mAuthListener;
     private Button signIn;
     private Button signUp;
     @Override

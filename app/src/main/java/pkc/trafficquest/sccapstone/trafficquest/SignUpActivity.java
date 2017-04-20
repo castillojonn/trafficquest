@@ -24,7 +24,7 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth mAuthListener;
     private Button mSignUpButton;
     private EditText retypePass;
-    private FirebaseAuth.AuthStateListener mAuthlistener;
+    //private FirebaseAuth.AuthStateListener mAuthlistener;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.

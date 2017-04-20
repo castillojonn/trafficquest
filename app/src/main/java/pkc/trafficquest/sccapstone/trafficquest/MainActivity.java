@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final int SETTINGS_REQUEST_LOCATION = 3; // used when requesting to turn on location services on the user's device
     private static final int SELECT_LOCATION_REQUEST_CODE = 100;
     private FirebaseAuth mAuth;
+    private FirebaseUser user = mAuth.getInstance().getCurrentUser();
     private ArrayList<Accidents> accidents = new ArrayList<>(); // arraylist of accidents
     private ArrayList<Accidents> getAccidents = new ArrayList<>();
     private List<String> names = new ArrayList<String>(); // a list of strings used in the listview in LogActivity
@@ -432,6 +433,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         else if (id == R.id.action_getFromFirebase) { // if get from Firebase is requested, get and display the last queried results
             getDataFromFirebase();
+            names.clear();
+            accidents.clear();
         }
         else if (id == android.R.id.home) { // if "hamburger button is selected, open or close the drawer
             DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
