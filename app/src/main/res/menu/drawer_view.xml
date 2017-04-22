@@ -15,6 +15,11 @@
         android:title="Maps"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_getFromFirebase"
+        android:orderInCategory="102"
+        android:title="Get From Firebase"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_logout"
         android:orderInCategory="103"
         android:title="Logout"

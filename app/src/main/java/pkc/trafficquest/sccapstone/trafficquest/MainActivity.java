@@ -187,6 +187,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         connectHereButton();
         connectPickFromMap();
+        final boolean onlineStat = isOnline();
+        findViewById(R.id.action_settings).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!(searchLat.getText().toString().equals("")) && !(searchLng.getText().toString().equals(""))){
+                    searchLatDouble = Double.parseDouble(searchLat.getText().toString()); // converts the contents of the EditText to a double
+                    searchLngDouble = Double.parseDouble(searchLng.getText().toString());
+                }
+                if (onlineStat) {
+                    isLogRequest = true; // used in the requestData method to check if it is a request to display the log
+                    //Toast.makeText(this, "Results", Toast.LENGTH_LONG).show();
+                    names.clear(); // clear the string list so it won't keep adding to the existing list
+                    accidents.clear(); // clear the accident list
+                    requestData(searchLatDouble, searchLngDouble); // requests data by the lattitude and longitude entered in the editText fields
+                } else {
+                    Toast.makeText(getApplicationContext(), "NETWORK IS NOT AVAILABLE", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     /*
@@ -340,6 +359,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return false;
             }
         });
+        navigationView.getMenu().findItem(R.id.action_getFromFirebase).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawerLayout.closeDrawer(Gravity.LEFT);
+                getDataFromFirebase();
+                names.clear();
+                accidents.clear();
+                return false;
+            }
+        });
         navigationView.getMenu().findItem(R.id.action_logout).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -383,21 +413,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // ATTENTION: This was auto-generated to implement the App Indexing API.
     // See https://g.co/AppIndexing/AndroidStudio for more information.
 
-    @Override
+    /**@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         return true;
-    }
+    }**/
 
-    @Override
+    //@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (!(searchLat.getText().toString().equals("")) && !(searchLng.getText().toString().equals(""))){
+        /**if (!(searchLat.getText().toString().equals("")) && !(searchLng.getText().toString().equals(""))){
             searchLatDouble = Double.parseDouble(searchLat.getText().toString()); // converts the contents of the EditText to a double
             searchLngDouble = Double.parseDouble(searchLng.getText().toString());
         }
@@ -436,7 +466,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             names.clear();
             accidents.clear();
         }
-        else if (id == android.R.id.home) { // if "hamburger button is selected, open or close the drawer
+        else **/if (id == android.R.id.home) { // if "hamburger button is selected, open or close the drawer
             DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
             if (mDrawerLayout.isDrawerOpen(GravityCompat.START)){
                 mDrawerLayout.closeDrawer(GravityCompat.START); // close drawer if drawer is already open
