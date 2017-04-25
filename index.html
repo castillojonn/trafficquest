@@ -6,10 +6,51 @@
 </head>
 
 <body>
-<h1>Traffic Quest</h1>
-<iframe src="https://player.vimeo.com/video/214574862" width="640" height="1138" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-<p><a href="https://vimeo.com/214574862">Traffic Quest App Showcase</a> from <a href="https://vimeo.com/user65837226">Traffic Quest</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
-<p>This app finds and presents to the user a set of incidents around a requested area. These incidents can be viewed in both a list, which can be downloaded as a CSV file), or on a map for a visual representation of incident locations.</p>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Traffic Quest</a>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">App Info<span class="sr-only">(current)</span></a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+
+<div style="background-image:url(trafficquest.jpg);" class="jumbotron">
+    <h1 style="text-align: center;color:white">Traffic Quest</h1>
+    <h2 style="text-align: center;color:white">Displaying traffic data easily</h2>
+    <br>
+    <p style="text-align: center"><a class="btn btn-primary btn-lg" href="https://github.com/SCCapstone2/TrafficQuest" role="button">Checkout Repo</a>
+    </p>
+</div>
+    <div style="text-align: center"><iframe src="https://player.vimeo.com/video/214574862" width="640" height="1138" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>
+
+<p style="text-align: center"><a href="https://vimeo.com/214574862">Traffic Quest App Showcase</a> from <a href="https://vimeo.com/user65837226">Traffic Quest</a> on <a href="https://vimeo.com">Vimeo</a></p>
+
+
+<div class="container">
+	<p>This app finds and presents to the user a set of incidents around a requested area. These incidents can be viewed in both a list, which can be downloaded as a CSV file), or on a map for a visual representation of incident locations.</p>
 <h2>Requesting Traffic Data</h2>
 <h3>In list form</h3>
 <p>
@@ -26,11 +67,12 @@
 <p>
 	From the main screen, pull the app drawer out from the left side of the screen. There will be an option for "Saved Searches". Here is where you can access searches saved using the maps save search feature. Clicking on a saved search will display the same query as before (NOTE: THIS FEATURE NOT FULLY IMPLEMENTED YET)
 </p>
-<h2>
+<h2 id="about">
 	Credit
 </h2>
-<p>
-	Daniel Free Jonnathan Castillo Keenan Dooley Ryan Chisolm
-</p>
+	<h3>This app created for the capstone project by:</h3>
+	<h3 id="about">Daniel Free, Jonnathan Castillo, Keenan Dooley, Ryan Chisolm</h3>
+</div>
+
 </body>
 </html>
